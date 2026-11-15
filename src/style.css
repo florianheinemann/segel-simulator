@@ -65,7 +65,10 @@ body.auto .sheet { visibility: hidden; }
 #crewNote { display: none; position: absolute; left: calc(10px + var(--sl)); bottom: calc(10px + var(--sb)); font-size: 11px; color: var(--dim); text-shadow: 0 1px 2px #000; }
 body.auto #crewNote { display: block; }
 
-#wheelBox { flex: 1; max-width: 380px; text-align: center; }
+#wheelBox { flex: 1; max-width: 480px; text-align: center; }
+#wheelRow { display: flex; align-items: stretch; gap: 6px; }
+#wheelTrack { flex: 1; min-width: 0; }
+.nudge { width: 52px; font-size: 12.5px; border-radius: 22px; padding: 0; white-space: nowrap; }
 #rudLbl { font-size: 11.5px; text-shadow: 0 1px 3px #000; margin-bottom: 2px; }
 #wheelTrack { position: relative; background: var(--glass); border: 1px solid var(--line); border-radius: 22px; padding: 0 6px; }
 #wheelTrack::before { content: ""; position: absolute; left: 50%; top: 5px; bottom: 5px; width: 2px; margin-left: -1px; background: var(--accent); opacity: 0.8; }
@@ -73,7 +76,7 @@ body.auto #crewNote { display: block; }
 #wheel::-webkit-slider-runnable-track { height: 42px; background: transparent; }
 #wheel::-webkit-slider-thumb { -webkit-appearance: none; width: 46px; height: 34px; margin-top: 4px; border-radius: 17px; background: #f2f6f9; border: 2px solid #0b2f4a; box-shadow: 0 1px 5px rgba(0,0,0,0.5); }
 #wheel::-moz-range-thumb { width: 44px; height: 32px; border-radius: 17px; background: #f2f6f9; border: 2px solid #0b2f4a; }
-.ends { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--dim); padding: 3px 10px 0; text-shadow: 0 1px 2px #000; }
+.ends { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--dim); padding: 3px 68px 0; text-shadow: 0 1px 2px #000; }
 #center { font-size: 10.5px; padding: 3px 10px; border-radius: 9px; }
 
 #toast { position: fixed; left: 50%; top: 38%; transform: translateX(-50%); padding: 8px 16px; background: rgba(160, 30, 30, 0.9); border-radius: 10px; font-size: 15px; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; text-align: center; }

@@ -35,6 +35,22 @@ const setRudder = (v: number) => {
   wheel.value = String(sim.rudder);
 };
 $('center').addEventListener('click', () => setRudder(0));
+// Feinsteuerung: je Tipp 1° nach Bb/Stb, gedrückt halten wiederholt
+document.querySelectorAll<HTMLButtonElement>('[data-nudge]').forEach((b) => {
+  const dir = +b.dataset.nudge!;
+  let timer = 0;
+  const step = () => setRudder(Math.round(sim.rudder) + dir);
+  const stop = () => { clearTimeout(timer); clearInterval(timer); b.classList.remove('on'); };
+  b.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    b.setPointerCapture(e.pointerId);
+    b.classList.add('on');
+    step();
+    timer = window.setTimeout(() => { timer = window.setInterval(step, 120); }, 450);
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(ev, stop);
+  b.addEventListener('contextmenu', (e) => e.preventDefault());
+});
 
 // ---- Schoten (gedrückt halten) -------------------------------------------------
 document.querySelectorAll<HTMLButtonElement>('[data-sheet]').forEach((b) => {

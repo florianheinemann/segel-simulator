@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4 – 2026-11-15
+
+- Knöpfe links und rechts vom Rad-Schieber: je Tipp 1° Ruder nach Bb bzw. Stb
+
 ## 0.1.3 – 2026-11-15
 
 - Der Blick bleibt stehen, wo man ihn hingezogen hat; neuer Knopf „Blick voraus“
