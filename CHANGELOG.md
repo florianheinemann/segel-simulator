@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.5 – 2026-11-15
+
+- Option im Menü: rote Marken (Bügel) am Verklicker ein- und ausblenden
+
 ## 0.3.4 – 2026-11-15
 
 - „Ree!“ und „Rund achtern!“ geben jetzt eine sichtbare Rückmeldung mit der Richtung, in die das Ruder zu legen ist

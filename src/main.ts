@@ -11,10 +11,10 @@ const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getEleme
 const deg3 = (v: number) => String(Math.round(v) % 360).padStart(3, '0') + '°';
 
 // ---- Einstellungen ----------------------------------------------------------
-interface Prefs { cfg: Config; top: boolean; hint: boolean; cmds: boolean }
+interface Prefs { cfg: Config; top: boolean; hint: boolean; cmds: boolean; tabs: boolean }
 const STORE = 'segelsim.v1';
 function loadPrefs(): Prefs {
-  const p: Prefs = { cfg: defaultConfig(), top: true, hint: true, cmds: false };
+  const p: Prefs = { cfg: defaultConfig(), top: true, hint: true, cmds: false, tabs: true };
   try {
     const s = JSON.parse(localStorage.getItem(STORE) || 'null');
     if (s) Object.assign(p, s, { cfg: { ...p.cfg, ...s.cfg } });
@@ -314,6 +314,8 @@ function syncMenu() {
   $<HTMLInputElement>('cGust').checked = c.gusts;
   $<HTMLInputElement>('cTop').checked = prefs.top;
   $<HTMLInputElement>('cHint').checked = prefs.hint;
+  $<HTMLInputElement>('cTabs').checked = prefs.tabs;
+  view.setVaneTabs(prefs.tabs);
   $<HTMLInputElement>('cManual').checked = c.manualSheets;
   $<HTMLInputElement>('cManual').disabled = c.level === 1;
   $('manualLbl').style.opacity = c.level === 1 ? '0.45' : '';
@@ -355,6 +357,7 @@ bind('sSet', (el) => (sim.cfg.currentSet = +el.value));
 bind('cGust', (el) => (sim.cfg.gusts = el.checked));
 bind('cTop', (el) => (prefs.top = el.checked));
 bind('cHint', (el) => (prefs.hint = el.checked));
+bind('cTabs', (el) => (prefs.tabs = el.checked));
 bind('cManual', (el) => (sim.cfg.manualSheets = el.checked));
 showCmds(prefs.cmds);
 setCourse(false);

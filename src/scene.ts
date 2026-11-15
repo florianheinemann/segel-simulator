@@ -264,6 +264,11 @@ export class View {
     sc.add(this.yawG, this.vaneCam, this.tellCam);
   }
 
+  /** Rote Marken (Bügel) am Verklicker ein- oder ausblenden */
+  setVaneTabs(on: boolean) {
+    for (const c of this.vane.children) if (c.name === 'tab') c.visible = on;
+  }
+
   private marksG = new THREE.Group();
   /** Tonnen des Kurses zeichnen: die nächste (hervorgehoben) und die danach */
   setCourse(marks: { x: number; z: number }[], idx: number) {
@@ -449,6 +454,7 @@ export class View {
       arm.add(bar, tab);
       arm.rotation.y = sgn * 32 * DEG;
       arm.position.y = -0.06;
+      arm.name = 'tab';
       this.vane.add(arm);
     }
     // bewusst überzeichnet, damit er in der Lupe trotz weitem Ausschnitt lesbar bleibt
