@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.8 – 2026-11-15
+
+- Draufsicht wieder groß links in der Mitte; Fäden-Lupe in normaler Größe oben neben dem Verklicker, leicht überlappend
+
 ## 0.3.7 – 2026-11-15
 
 - Lupen ohne Beschriftung; Fäden-Lupe und Draufsicht stehen links übereinander und sind kleiner
