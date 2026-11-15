@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b2f4a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon.svg">
+<title>Segel-Simulator</title>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<div id="hud">
+  <div id="topbar">
+    <button id="menuBtn" aria-label="Menü">☰</button>
+    <div class="tile"><span class="lbl">Kompass</span><b id="iHdg">000°</b></div>
+    <div class="tile"><span class="lbl">FdW</span><b id="iStw">0.0</b><span class="unit">kn</span></div>
+    <div class="tile wind">
+      <svg viewBox="-20 -20 40 40" width="38" height="38" aria-hidden="true">
+        <circle r="18" class="dial"/>
+        <path d="M0 -11 C4 -5 4.5 4 3.5 10 L-3.5 10 C-4.5 4 -4 -5 0 -11Z" class="boat"/>
+        <g id="iAwaArrow"><path d="M0 -19 L3.5 -11 L-3.5 -11Z" class="aw"/></g>
+      </svg>
+      <div><span class="lbl">Wind scheinbar</span><b id="iAwa">0°</b> <span id="iAws" class="unit">0 kn</span></div>
+    </div>
+    <div class="tile"><span class="lbl">Krängung</span><b id="iHeel">0°</b></div>
+    <div class="tile"><span class="lbl">GPS KüG · FüG</span><b id="iCog">000°</b> <span id="iSog" class="unit">0.0 kn</span></div>
+  </div>
+
+  <div id="insets">
+    <div class="inset"><canvas id="insVane"></canvas><span>Verklicker</span></div>
+    <div class="inset" id="tellInset"><canvas id="insTell"></canvas><span id="tellLabel">Fock-Fäden ⇄</span></div>
+  </div>
+
+  <div id="hint"></div>
+
+  <svg id="topview" viewBox="-50 -50 100 100" aria-hidden="true">
+    <circle r="47" class="tvbg"/>
+    <g id="tvCur"><path d="M0 30 L0 44 M-4 39 L0 45 L4 39" class="cur"/></g>
+    <g id="tvTw"><path d="M0 -46 L0 -30 M-4 -35 L0 -29 L4 -35" class="tw"/></g>
+    <g id="tvAw"><path d="M0 -46 L0 -26 M-5 -32 L0 -25 L5 -32" class="awl"/></g>
+    <path d="M0 -24 C8 -12 9 6 7 20 L-7 20 C-9 6 -8 -12 0 -24Z" class="boat"/>
+    <line id="tvJib" x1="0" y1="-23" x2="0" y2="-3" class="sail"/>
+    <line id="tvBoom" x1="0" y1="-5" x2="0" y2="14" class="sail"/>
+    <line id="tvRud" x1="0" y1="20" x2="0" y2="28" class="rud"/>
+  </svg>
+  <div id="tvLegend"><i class="l-aw"></i>scheinbar <i class="l-tw"></i>wahr</div>
+
+  <div id="bottom">
+    <div class="sheet" id="sheetMain">
+      <span class="lbl">Großschot</span>
+      <div class="bar"><i id="barMain"></i></div>
+      <div class="btns"><button data-sheet="main" data-dir="-1">fieren</button><button data-sheet="main" data-dir="1">dicht</button></div>
+    </div>
+    <div id="wheelBox">
+      <div id="rudLbl">Ruder mittschiffs</div>
+      <div id="wheelTrack"><input id="wheel" type="range" min="-35" max="35" step="0.5" value="0" aria-label="Ruder"></div>
+      <div class="ends"><span>Bb</span><button id="center">⊙ mittschiffs</button><span>Stb</span></div>
+    </div>
+    <div class="sheet" id="sheetJib">
+      <span class="lbl">Fockschot</span>
+      <div class="bar"><i id="barJib"></i></div>
+      <div class="btns"><button data-sheet="jib" data-dir="-1">fieren</button><button data-sheet="jib" data-dir="1">dicht</button></div>
+    </div>
+  </div>
+  <div id="crewNote">Crew trimmt die Segel</div>
+</div>
+
+<div id="toast"></div>
+
+<div id="menu" hidden>
+  <div class="panel">
+    <h1>Segel-Simulator <small id="ver"></small></h1>
+    <label class="row">Stufe</label>
+    <div id="levels" class="seg">
+      <button data-level="1"><b>1 · Steuern</b><span>Crew trimmt. Verklicker, Fäden und Kurse lesen.</span></button>
+      <button data-level="2"><b>2 · Trimmen</b><span>Schoten selbst bedienen, Luvgierigkeit ausgleichen.</span></button>
+      <button data-level="3"><b>3 · Revier</b><span>Dazu Böen und Strom.</span></button>
+    </div>
+    <label class="row">Wind <b id="oBft"></b><input id="sBft" type="range" min="1" max="7" step="1"></label>
+    <label class="row">Wind aus <b id="oTwd"></b><input id="sTwd" type="range" min="0" max="355" step="5"></label>
+    <label class="row">Strom <b id="oCur"></b><input id="sCur" type="range" min="0" max="3" step="0.5"></label>
+    <label class="row">Strom setzt nach <b id="oSet"></b><input id="sSet" type="range" min="0" max="355" step="5"></label>
+    <div class="checks">
+      <label><input id="cGust" type="checkbox"> Böen</label>
+      <label><input id="cTop" type="checkbox"> Draufsicht mit wahrem Wind</label>
+      <label><input id="cHint" type="checkbox"> Trimm-Hinweise</label>
+    </div>
+    <div class="actions">
+      <button id="restart">Neu starten</button>
+      <button id="closeMenu" class="primary">Weiter segeln</button>
+    </div>
+    <p class="help">Rad: Schieber bleibt stehen, wo du ihn loslässt. Über die See ziehen = umsehen. Tastatur: ←/→ Ruder, Q/A Groß, W/S Fock, Leertaste Pause.</p>
+  </div>
+</div>
+
+<div id="rotate"><div>↻<br>Bitte ins Querformat drehen</div></div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
