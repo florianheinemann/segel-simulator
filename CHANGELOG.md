@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.0 – 2026-11-15
+
+Wende und Halse mit Kommandos.
+
+- Kommando-Tafel („Kommandos“) mit allen Kommandos; man muss das richtige zur
+  richtigen Zeit wählen
+- Wende: „Klar zur Wende!“ – „Ist klar!“ – „Ree!“ – „Über die Fock!“
+- Halse: „Klar zur Halse!“ – „Fier auf die Schoten!“ – „Hol dicht die
+  Großschot!“ – „Rund achtern!“ – „Fier auf die Großschot!“ – „Über die Fock!“
+- Warnung, wenn ein Manöver aus der aktuellen Lage nicht gefahren werden kann
+- Die Crew arbeitet nur auf Kommando: Die Fock bleibt belegt und steht nach der
+  Wende back, bis „Über die Fock!“ kommt; nach der Halse steht sie als
+  Schmetterling
+- Auswertung nach dem Manöver: Dauer, Fahrtverlust, Fehler in der Reihenfolge,
+  Patenthalse, verhungerte Wende
+- Hinweiszeile nennt während des Manövers den nächsten Schritt (abschaltbar)
+- Knopf „Blick voraus“ sitzt jetzt neben der Draufsicht
+
 ## 0.1.4 – 2026-11-15
 
 - Knöpfe links und rechts vom Rad-Schieber: je Tipp 1° Ruder nach Bb bzw. Stb

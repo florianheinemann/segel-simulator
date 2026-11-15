@@ -74,10 +74,25 @@ describe('Sim', () => {
   it('Wende gelingt aus voller Fahrt und endet auf dem neuen Bug', () => {
     const sim = settled(45);
     sim.events.length = 0;
-    run(sim, 25, holdTwa(-45));
+    const hold = holdTwa(-45);
+    run(sim, 25, (b) => {
+      hold(b);
+      if (b.jibBack) b.passJib(); // Crew holt die Fock über
+    });
     expect(sim.events).toContain('wende');
     expect(sim.awa).toBeLessThan(0);
     expect(sim.heel).toBeGreaterThan(5);
     expect(sim.u * MS2KN).toBeGreaterThan(3);
+  });
+
+  it('Fock steht back, wenn sie nach der Wende nicht übergeholt wird', () => {
+    const sim = settled(45);
+    run(sim, 12, holdTwa(-45));
+    expect(sim.jibBack).toBe(true);
+    const slow = sim.u;
+    sim.passJib();
+    run(sim, 20, holdTwa(-45));
+    expect(sim.jibBack).toBe(false);
+    expect(sim.u).toBeGreaterThan(slow);
   });
 });

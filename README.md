@@ -8,8 +8,7 @@ Home-Bildschirm hinzufügen.
 **Lernziele**
 
 1. Verklicker und Windfäden lesen und richtig darauf reagieren.
-2. Wende und Halse Schritt für Schritt in der Rolle des Skippers fahren
-   (Kommandos folgen in v0.2).
+2. Wende und Halse Schritt für Schritt in der Rolle des Skippers fahren.
 
 ## Was die App zeigt
 
@@ -24,11 +23,32 @@ Home-Bildschirm hinzufügen.
 | Draufsicht | Lernhilfe: Boot von oben mit scheinbarem (blau) und wahrem Wind (gestrichelt), Segelstellung, Ruder, Strom. Abschaltbar. |
 | Hinweiszeile | Lernhilfe: Kurs zum Wind, Bug und ein Trimm-Tipp. Abschaltbar. |
 
+## Wende und Halse
+
+„Kommandos“ öffnet die Tafel mit allen Kommandos. Sie ist immer dieselbe – man
+muss das richtige Kommando zur richtigen Zeit geben. Die Crew antwortet und
+arbeitet nur auf Kommando. Passt die Lage nicht (falscher Kurs, zu wenig
+Fahrt), gibt es beim Anwählen eine Warnung mit dem Grund.
+
+| Wende (vom Am-Wind-Kurs, mit Fahrt) | Halse (vom Raumschotskurs) |
+| --- | --- |
+| „Klar zur Wende!“ – Crew: „Ist klar!“ | „Klar zur Halse!“ – Crew: „Ist klar!“ |
+| „Ree!“ und anluven, durch den Wind drehen | abfallen bis fast vor den Wind, „Fier auf die Schoten!“ |
+| Bug ist durch den Wind: „Über die Fock!“ | „Hol dicht die Großschot!“ – Crew: „Großschot ist dicht!“ |
+| auf neuen Am-Wind-Kurs abfallen, Ruder stützen | „Rund achtern!“ und mit dem Heck durch den Wind |
+| | Baum ist über: „Fier auf die Großschot!“, dann „Über die Fock!“ |
+
+Was schiefgehen kann: Ohne „Über die Fock!“ steht die Fock back und bremst. Mit
+zu wenig Fahrt verhungert die Wende im Wind. Kommt der Baum bei gefierter
+Großschot über, ist es eine Patenthalse. Nach dem Manöver zeigt eine kurze
+Auswertung Dauer, Fahrtverlust und Fehler. Mit eingeschalteten Trimm-Hinweisen
+nennt die Hinweiszeile jeweils den nächsten Schritt.
+
 ## Stufen
 
 | Stufe | Du machst | Dazu kommt |
 | --- | --- | --- |
-| 1 · Steuern | Nur steuern, die Crew trimmt | Verklicker, Fäden, Kurse zum Wind |
+| 1 · Steuern | Steuern und Kommandos geben, die Crew trimmt | Verklicker, Fäden, Kurse zum Wind, Manöver |
 | 2 · Trimmen | Schoten selbst bedienen | Volle Luvgierigkeit |
 | 3 · Revier | Wie 2 | Böen (dunkle Flecken auf dem Wasser) und 1 kn Strom |
 
@@ -65,7 +85,8 @@ hinzufügen – iOS übernimmt beides nur beim Hinzufügen.
 - Wellen sind nur Optik.
 
 Die Physik liegt in `src/sim.ts` (ohne Rendering, mit Tests in
-`src/sim.test.ts`), die 3D-Szene in `src/scene.ts`, die Bedienung in
+`src/sim.test.ts`), die Manöverlogik in `src/maneuver.ts` (Tests in
+`src/maneuver.test.ts`), die 3D-Szene in `src/scene.ts`, die Bedienung in
 `src/main.ts`, Offline-Cache und Aktualisierung in `src/pwa.ts` und
 `public/sw.js`. Icons und Startbilder erzeugt `node scripts/gen-assets.cjs` aus
 `public/icon.svg` (braucht Playwright).
@@ -99,8 +120,5 @@ Menü angezeigt.
 
 ## Fahrplan
 
-- **v0.2** – Wende und Halse mit Kommandos nach SKS-Lehrbuch („Klar zur
-  Wende!“ – „Ist klar!“ – „Ree!“ …), Warnung bei falscher Ausgangslage,
-  Auswertung nach dem Manöver, Crew-Arbeit an den Schoten.
 - **v0.3** – Kursmodus mit Tonnen zum Üben von Wenden, Halsen und Kurshalten.
 - Später: Pause/Zeitlupe als Schaltfläche, Reffen.

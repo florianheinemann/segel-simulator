@@ -51,6 +51,9 @@
 
   <div id="hint"></div>
   <button id="lookReset" hidden>⟲ Blick voraus</button>
+  <button id="cmdBtn">Kommandos</button>
+  <div id="cmds" hidden></div>
+  <div id="report" hidden></div>
 
   <svg id="topview" viewBox="-50 -50 100 100" aria-hidden="true">
     <circle r="47" class="tvbg"/>
@@ -95,7 +98,7 @@
     <h1>Segel-Simulator <small id="ver"></small></h1>
     <label class="row">Stufe</label>
     <div id="levels" class="seg">
-      <button data-level="1"><b>1 · Steuern</b><span>Crew trimmt. Verklicker, Fäden und Kurse lesen.</span></button>
+      <button data-level="1"><b>1 · Steuern</b><span>Crew trimmt. Verklicker, Fäden, Kurse und Manöver-Kommandos.</span></button>
       <button data-level="2"><b>2 · Trimmen</b><span>Schoten selbst bedienen, Luvgierigkeit ausgleichen.</span></button>
       <button data-level="3"><b>3 · Revier</b><span>Dazu Böen und Strom.</span></button>
     </div>
@@ -112,6 +115,7 @@
       <button id="restart">Neu starten</button>
       <button id="closeMenu" class="primary">Weiter segeln</button>
     </div>
+    <p class="help">Manöver: „Kommandos“ öffnet die Tafel. Die Crew arbeitet nur auf Kommando – auch die Fock geht erst mit „Über die Fock!“ über.</p>
     <p class="help">Rad: Schieber bleibt stehen, wo du ihn loslässt; die Knöpfe daneben legen je 1° Ruder nach Bb/Stb (halten = weiter). Über die See ziehen = umsehen, „Blick voraus“ schwenkt zurück. Tastatur: ←/→ Ruder, Q/A Groß, W/S Fock, Leertaste Pause.</p>
   </div>
 </div>

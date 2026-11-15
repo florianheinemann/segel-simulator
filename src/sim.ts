@@ -96,6 +96,12 @@ export class Sim {
   alphaMain = 0;
   alphaJib = 0;
   jibShadow = 1;
+  /** Fock steht back: nach der Wende noch auf der alten (jetzt Luv-)Seite belegt */
+  jibBack = false;
+  /** Crew trimmt vorübergehend mit (Kommando „Fier auf die Schoten!“) */
+  crewTrim = false;
+  /** Crew fährt die Großschot auf einen Wert; hold = dort festhalten (Halse) */
+  crewMain: { target: number; hold: boolean } | null = null;
   byLee = false;
   cog = 0;
   sog = 0;
@@ -117,8 +123,20 @@ export class Sim {
     this.reset();
   }
 
+  /** Crew trimmt laufend: immer in Stufe 1, sonst nur vorübergehend auf Kommando */
   get autoTrim() {
-    return this.cfg.level === 1;
+    return this.cfg.level === 1 || this.crewTrim;
+  }
+  /** Fock auf die Seite holen, auf die sie beim jetzigen Wind gehört */
+  passJib() {
+    this.jibSide = this.awa >= 0 ? 1 : -1;
+  }
+  /** Beide Segel auf die zum Wind passende Seite stellen (z. B. nach Änderung der Windrichtung) */
+  settleSails() {
+    const side = norm180(this.cfg.twd - this.heading) >= 0 ? 1 : -1;
+    this.mainSide = this.jibSide = side;
+    this.boom = -side * Math.abs(this.boom);
+    this.jib = -side * Math.abs(this.jib);
   }
   get weatherHelm() {
     return this.cfg.level === 1 ? 0.3 : 1;
@@ -134,6 +152,9 @@ export class Sim {
     this.jibSheet = 38;
     this.boom = this.jib = -35;
     this.gT = -20;
+    this.crewTrim = false;
+    this.crewMain = null;
+    this.events.length = 0;
   }
 
   private updateGust(dt: number) {
@@ -184,40 +205,48 @@ export class Sim {
     const s = this.awa >= 0 ? 1 : -1;
 
     // --- Trimm ------------------------------------------------------------
-    if (this.autoTrim) {
+    const rate = (i: number) => (i < 0 ? 30 : 16) * dt;
+    if (this.crewMain) {
+      this.mainSheet = approach(this.mainSheet, this.crewMain.target, 28 * dt);
+      if (!this.crewMain.hold && Math.abs(this.mainSheet - this.crewMain.target) < 0.5) this.crewMain = null;
+    } else if (this.autoTrim) {
       this.mainSheet = approach(this.mainSheet, clamp(absA - 17, SHEET.mainMin, SHEET.mainMax), 25 * dt);
+    } else {
+      this.mainSheet = clamp(this.mainSheet - this.mainInput * rate(this.mainInput), SHEET.mainMin, SHEET.mainMax);
+    }
+    if (this.autoTrim) {
       this.jibSheet = approach(this.jibSheet, clamp(absA - 15, SHEET.jibMin, SHEET.jibMax), 25 * dt);
     } else {
-      const rate = (i: number) => (i < 0 ? 30 : 16) * dt;
-      this.mainSheet = clamp(this.mainSheet - this.mainInput * rate(this.mainInput), SHEET.mainMin, SHEET.mainMax);
       this.jibSheet = clamp(this.jibSheet - this.jibInput * rate(this.jibInput), SHEET.jibMin, SHEET.jibMax);
     }
 
     // --- Segelseiten (Wende / Halse) -----------------------------------------
-    let gybed = false;
+    // Das Groß geht von selbst über; die Fock bleibt belegt, bis die Crew sie
+    // auf Kommando überholt (passJib).
     if (this.mainSide !== s) {
       if (absA < 100) {
         this.mainSide = s;
         this.events.push('wende');
       } else if (180 - absA > 12 || this.mainSheet < 15) {
         this.mainSide = s;
-        gybed = true;
         this.events.push(this.mainSheet > 30 && this.aws > 2.5 ? 'patenthalse' : 'halse');
       }
     }
-    if (this.jibSide !== s && (absA < 100 || 180 - absA > 8 || gybed)) this.jibSide = s;
     this.byLee = this.mainSide !== s;
+    this.jibBack = this.jibSide !== s && absA < 100;
 
     const aM = this.mainSide === s ? absA : 180;
     const aJ = this.jibSide === s ? absA : 180;
     const boomMag = Math.min(this.mainSheet, aM);
-    const jibMag = Math.min(this.jibSheet, aJ);
+    const jibMag = this.jibBack ? this.jibSheet : Math.min(this.jibSheet, aJ);
     this.alphaMain = aM - boomMag;
-    this.alphaJib = aJ - jibMag;
+    // back stehende Fock: voll angeströmt von der falschen Seite, bremst und drückt den Bug nach Lee
+    this.alphaJib = this.jibBack ? Math.min(90, absA + jibMag) : aJ - jibMag;
     this.boom = approach(this.boom, -this.mainSide * boomMag, 140 * dt);
     this.jib = approach(this.jib, -this.jibSide * jibMag, 140 * dt);
     // Fock in der Abdeckung des Großsegels auf tiefen Kursen
-    this.jibShadow = 1 - 0.75 * clamp((absA - 145) / 25, 0, 1);
+    // (nicht, wenn sie als Schmetterling auf der anderen Seite steht)
+    this.jibShadow = this.jibSide !== s ? 1 : 1 - 0.75 * clamp((absA - 145) / 25, 0, 1);
 
     // --- Kräfte -------------------------------------------------------------
     const q = 0.6 * this.aws * this.aws;
@@ -232,10 +261,10 @@ export class Sim {
       };
     };
     const fm = force(this.alphaMain, aM, AREA_MAIN);
-    const fj = force(this.alphaJib, aJ, AREA_JIB * this.jibShadow);
+    const fj = force(this.alphaJib, this.jibBack ? absA : aJ, AREA_JIB * this.jibShadow);
     // Seitenkräfte mit Vorzeichen (+ = nach Steuerbord)
     const sideM = -this.mainSide * fm.side;
-    const sideJ = -this.jibSide * fj.side;
+    const sideJ = -(this.jibBack ? s : this.jibSide) * fj.side;
     const hullDrive = -q * 3 * Math.cos(this.awa * DEG);
     const hullSide = -q * 10 * Math.sin(this.awa * DEG);
     const drive = fm.drive + fj.drive + hullDrive;

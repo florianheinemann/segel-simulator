@@ -488,7 +488,7 @@ export class View {
     this.jibSail.set(
       JIB_TACK, JIB_HEAD,
       V(JIB_TACK.x + sj * JIB_FOOT, 1.9, JIB_TACK.z + cj * JIB_FOOT),
-      -sim.jibSide, 0.1, flapJ, t,
+      sim.jibBack ? -Math.sign(sim.awa || 1) : -sim.jibSide, 0.1, flapJ, t,
     );
 
     // Windfäden
@@ -501,8 +501,9 @@ export class View {
       this.jibSail.point(0.16, s, p);
       // Farben bleiben an der Bootsseite: Bb rot, Stb grün
       const luvTT = sim.jibSide > 0 ? stb : port, leeTT = sim.jibSide > 0 ? port : stb;
-      luvTT.set(p.clone().addScaledVector(n, 0.05), jc, calm ? 'hang' : sim.alphaJib < 8 ? 'flutter' : 'stream', t, dt);
-      leeTT.set(p.clone().addScaledVector(n, -0.05), jc, calm ? 'hang' : sim.alphaJib > 24 || sim.alphaJib < 1 ? 'flutter' : 'stream', t, dt);
+      const back = sim.jibBack;
+      luvTT.set(p.clone().addScaledVector(n, 0.05), jc, calm ? 'hang' : back || sim.alphaJib < 8 ? 'flutter' : 'stream', t, dt);
+      leeTT.set(p.clone().addScaledVector(n, -0.05), jc, calm ? 'hang' : back || sim.alphaJib > 24 || sim.alphaJib < 1 ? 'flutter' : 'stream', t, dt);
     }
     const mc = this.main.chord.clone().normalize();
     const stalled = sim.alphaMain > 26;

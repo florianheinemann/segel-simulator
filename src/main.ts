@@ -2,6 +2,7 @@ import './style.css';
 import { Config, Level, MS2KN, RUDDER_MAX, SHEET, Sim, defaultConfig, levelPreset, pointOfSail } from './sim';
 import { View } from './scene';
 import { initPwa } from './pwa';
+import { COMMANDS, Crew, Report, Voice } from './maneuver';
 
 declare const __APP_VERSION__: string;
 declare const __BUILD__: string;
@@ -9,10 +10,10 @@ const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getEleme
 const deg3 = (v: number) => String(Math.round(v) % 360).padStart(3, '0') + '°';
 
 // ---- Einstellungen ----------------------------------------------------------
-interface Prefs { cfg: Config; top: boolean; hint: boolean }
+interface Prefs { cfg: Config; top: boolean; hint: boolean; cmds: boolean }
 const STORE = 'segelsim.v1';
 function loadPrefs(): Prefs {
-  const p: Prefs = { cfg: defaultConfig(), top: true, hint: true };
+  const p: Prefs = { cfg: defaultConfig(), top: true, hint: true, cmds: false };
   try {
     const s = JSON.parse(localStorage.getItem(STORE) || 'null');
     if (s) Object.assign(p, s, { cfg: { ...p.cfg, ...s.cfg } });
@@ -70,7 +71,7 @@ const keys = new Set<string>();
 addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLInputElement && e.target !== wheel) return;
   const k = e.key.toLowerCase();
-  if (k === ' ') { paused = !paused; toast(paused ? 'Pause' : 'Weiter', true); e.preventDefault(); return; }
+  if (k === ' ') { paused = !paused; toast(paused ? 'Pause' : 'Weiter', 'info'); e.preventDefault(); return; }
   if (['arrowleft', 'arrowright', 'q', 'a', 'w', 's'].includes(k)) { keys.add(k); e.preventDefault(); }
 });
 addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
@@ -107,21 +108,51 @@ $('tellInset').addEventListener('click', () => {
 
 // ---- Meldungen ----------------------------------------------------------------
 let toastTimer = 0;
-function toast(msg: string, info = false) {
+function toast(msg: string, kind: Voice = 'warn') {
   const t = $('toast');
   t.textContent = msg;
-  t.className = 'show' + (info ? ' info' : '');
+  t.className = `show ${kind}`;
   clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => (t.className = info ? 'info' : ''), 2600);
+  toastTimer = window.setTimeout(() => (t.className = kind), kind === 'warn' ? 3800 : 2400);
 }
 const bug = () => (sim.mainSide > 0 ? 'Steuerbordbug' : 'Backbordbug');
-function handleEvents() {
-  for (const e of sim.events.splice(0)) {
+function handleEvents(dt: number) {
+  const events = sim.events.splice(0);
+  for (const e of events) {
     if (e === 'patenthalse') toast('Patenthalse! Der Baum schlägt unkontrolliert über.');
-    else if (e === 'reset') toast('Küste voraus – zurück in die Reviermitte versetzt', true);
-    else if (sim.t > 1) toast(`${e === 'wende' ? 'Wende' : 'Halse'} – jetzt ${bug()}`, true);
+    else if (e === 'reset') toast('Küste voraus – zurück in die Reviermitte versetzt', 'info');
   }
+  crew.update(dt, events);
 }
+
+// ---- Manöver: Kommandos, Crew, Auswertung ---------------------------------------
+const crew = new Crew(sim);
+crew.say = (voice, text) => toast(text, voice);
+let reportTimer = 0;
+crew.onReport = (r: Report) => {
+  const el = $('report');
+  el.className = r.ok ? 'ok' : 'bad';
+  el.innerHTML = `<b>${r.title}</b><ul>${r.lines.map((l) => `<li>${l}</li>`).join('')}</ul><small>Tippen zum Schließen</small>`;
+  el.hidden = false;
+  clearTimeout(reportTimer);
+  reportTimer = window.setTimeout(() => (el.hidden = true), 15000);
+};
+$('report').addEventListener('click', () => ($('report').hidden = true));
+const cmds = $('cmds');
+for (const c of COMMANDS) {
+  const b = document.createElement('button');
+  b.textContent = c.label;
+  b.dataset.cmd = c.id;
+  b.addEventListener('click', () => crew.command(c.id));
+  cmds.appendChild(b);
+}
+const showCmds = (open: boolean) => {
+  prefs.cmds = open;
+  cmds.hidden = !open;
+  $('cmdBtn').classList.toggle('on', open);
+  savePrefs();
+};
+$('cmdBtn').addEventListener('click', () => showCmds(!!cmds.hidden));
 
 function hintText(): string {
   const a = Math.abs(sim.awa), aj = sim.alphaJib, am = sim.alphaMain;
@@ -174,7 +205,7 @@ function updateHud() {
   }
   if (prefs.hint) {
     const pos = `${pointOfSail(sim.twa)} · ${bug()} (Wind von ${sim.mainSide > 0 ? 'Stb' : 'Bb'})`;
-    $('hint').innerHTML = `<span class="pos">${pos}</span>${hintText()}`;
+    $('hint').innerHTML = `<span class="pos">${pos}</span>${crew.nextStep() ?? hintText()}`;
   }
 }
 
@@ -203,17 +234,18 @@ function syncMenu() {
 const openMenu = (open: boolean) => { menu.hidden = !open; paused = open; };
 $('menuBtn').addEventListener('click', () => openMenu(true));
 $('closeMenu').addEventListener('click', () => openMenu(false));
-$('restart').addEventListener('click', () => { sim.reset(); setRudder(0); openMenu(false); });
+$('restart').addEventListener('click', () => { sim.reset(); crew.reset(); setRudder(0); $('report').hidden = true; openMenu(false); });
 document.querySelectorAll<HTMLButtonElement>('#levels button').forEach((b) =>
   b.addEventListener('click', () => { Object.assign(sim.cfg, levelPreset(+b.dataset.level! as Level)); syncMenu(); }));
 const bind = (id: string, fn: (el: HTMLInputElement) => void) => $<HTMLInputElement>(id).addEventListener('input', (e) => { fn(e.target as HTMLInputElement); syncMenu(); });
 bind('sBft', (el) => (sim.cfg.bft = +el.value));
-bind('sTwd', (el) => (sim.cfg.twd = +el.value));
+bind('sTwd', (el) => { sim.cfg.twd = +el.value; sim.settleSails(); });
 bind('sCur', (el) => (sim.cfg.currentKn = +el.value));
 bind('sSet', (el) => (sim.cfg.currentSet = +el.value));
 bind('cGust', (el) => (sim.cfg.gusts = el.checked));
 bind('cTop', (el) => (prefs.top = el.checked));
 bind('cHint', (el) => (prefs.hint = el.checked));
+showCmds(prefs.cmds);
 $('ver').textContent = `v${__APP_VERSION__} · Build ${__BUILD__.split('+')[1]}`;
 syncMenu();
 
@@ -227,7 +259,7 @@ function frame(now: number) {
   if (!paused) {
     applyKeys(dt);
     sim.step(dt);
-    handleEvents();
+    handleEvents(dt);
     view.update(sim, dt);
     if ((hudT += dt) > 0.1) { hudT = 0; updateHud(); }
   }
