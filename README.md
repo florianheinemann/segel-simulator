@@ -15,7 +15,7 @@ Home-Bildschirm hinzufügen.
 
 | Element | Bedeutung |
 | --- | --- |
-| 3D-Sicht | Blick vom Steuerstand nach vorn; der Rudergänger sitzt in Luv. Über die See ziehen = umsehen. |
+| 3D-Sicht | Blick vom Steuerstand nach vorn; der Rudergänger sitzt in Luv. Über die See ziehen = umsehen; der Blick bleibt stehen, „Blick voraus“ schwenkt zurück. |
 | Lupe „Verklicker“ | Blick vom Steuerstand hoch zum Masttopp. Der Pfeil zeigt in den **scheinbaren** Wind, die roten Marken stehen fest. Der Bug liegt im Bild unten – so, wie man es beim Hochschauen sieht. |
 | Lupe „Fäden“ | Windfäden an der Fock (Bb rot, Stb grün); Antippen wechselt zu den Achterliekfäden am Groß. |
 | Instrumente | Kompasskurs, Fahrt durchs Wasser (FdW), scheinbarer Wind, Krängung, GPS (KüG/FüG). |

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3 – 2026-11-15
+
+- Der Blick bleibt stehen, wo man ihn hingezogen hat; neuer Knopf „Blick voraus“
+  schwenkt zurück
+
 ## 0.1.2 – 2026-11-15
 
 - Behoben: Nach dem Drehen des iPhones (Start im Hochformat) blieb die obere

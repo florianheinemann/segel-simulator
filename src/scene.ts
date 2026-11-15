@@ -15,6 +15,7 @@ const JIB_FOOT = 5.7;
 const EYE = V(0, 2.9, 4.5);
 const COAST_R = 7000;
 const HORIZON = new THREE.Color(0xcfe2ec);
+const LOOK_PITCH = -0.05;
 
 /** Segel als verformbares Dreiecksgitter mit Bauch nach Lee */
 class Sail {
@@ -185,8 +186,12 @@ export class View {
   private vaneAngle = 0;
   private time = 0;
   lookYaw = 0;
-  lookPitch = -0.05;
-  looking = false;
+  lookPitch = LOOK_PITCH;
+  /** true, solange der Blick zurück nach voraus schwenkt */
+  recentering = false;
+  get lookedAway() {
+    return Math.abs(this.lookYaw) > 0.02 || Math.abs(this.lookPitch - LOOK_PITCH) > 0.02;
+  }
   /** 'jib' oder 'main' – worauf das Fäden-Fenster zielt */
   tellTarget: 'jib' | 'main' = 'jib';
   private insets: { ctx: CanvasRenderingContext2D; cam: THREE.Camera }[];
@@ -519,9 +524,14 @@ export class View {
     const luvTarget = (sim.awa >= 0 ? 1 : -1) * 1.2;
     this.luvX += (luvTarget - this.luvX) * Math.min(1, dt * 1.5);
     this.eyeG.position.set(this.luvX, EYE.y, EYE.z);
-    if (!this.looking) {
-      this.lookYaw += (0 - this.lookYaw) * Math.min(1, dt * 4);
-      this.lookPitch += (-0.05 - this.lookPitch) * Math.min(1, dt * 4);
+    if (this.recentering) {
+      this.lookYaw += (0 - this.lookYaw) * Math.min(1, dt * 6);
+      this.lookPitch += (LOOK_PITCH - this.lookPitch) * Math.min(1, dt * 6);
+      if (!this.lookedAway) {
+        this.lookYaw = 0;
+        this.lookPitch = LOOK_PITCH;
+        this.recentering = false;
+      }
     }
     this.cam.rotation.set(this.lookPitch, this.lookYaw, 0);
 

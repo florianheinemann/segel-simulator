@@ -101,3 +101,6 @@ body.auto #crewNote { display: block; }
 #rotate { display: none; position: fixed; inset: 0; background: #0b2f4a; align-items: center; justify-content: center; text-align: center; font-size: 20px; z-index: 10; }
 @media (orientation: portrait) and (max-width: 700px) { #rotate { display: flex; } }
 @media (max-width: 760px) { .tile { min-width: 0; padding: 4px 6px; } .tile b { font-size: 15px; } .sheet { width: 128px; } }
+
+#lookReset { position: absolute; right: calc(8px + var(--sr)); top: calc(50% + 14px); padding: 9px 14px; font-size: 13px; border-color: var(--accent); }
+#lookReset[hidden] { display: none; }

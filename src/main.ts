@@ -72,14 +72,17 @@ let keyMain = false, keyJib = false;
 // ---- Umsehen ------------------------------------------------------------------
 const gl = $('gl');
 let drag: { id: number; x: number; y: number } | null = null;
-gl.addEventListener('pointerdown', (e) => { drag = { id: e.pointerId, x: e.clientX, y: e.clientY }; view.looking = true; gl.setPointerCapture(e.pointerId); });
+gl.addEventListener('pointerdown', (e) => { drag = { id: e.pointerId, x: e.clientX, y: e.clientY }; view.recentering = false; gl.setPointerCapture(e.pointerId); });
 gl.addEventListener('pointermove', (e) => {
   if (!drag || drag.id !== e.pointerId) return;
   view.lookYaw = Math.max(-2.6, Math.min(2.6, view.lookYaw + (e.clientX - drag.x) * 0.005));
   view.lookPitch = Math.max(-0.6, Math.min(1.3, view.lookPitch + (e.clientY - drag.y) * 0.005));
   drag.x = e.clientX; drag.y = e.clientY;
 });
-for (const ev of ['pointerup', 'pointercancel']) gl.addEventListener(ev, () => { drag = null; view.looking = false; });
+for (const ev of ['pointerup', 'pointercancel']) gl.addEventListener(ev, () => { drag = null; });
+// Der Blick bleibt stehen, wo man ihn hingezogen hat – dieser Knopf schwenkt zurück nach voraus
+const lookBtn = $('lookReset');
+lookBtn.addEventListener('click', () => { view.recentering = true; });
 
 $('tellInset').addEventListener('click', () => {
   view.tellTarget = view.tellTarget === 'jib' ? 'main' : 'jib';
@@ -212,6 +215,7 @@ function frame(now: number) {
     view.update(sim, dt);
     if ((hudT += dt) > 0.1) { hudT = 0; updateHud(); }
   }
+  lookBtn.hidden = !view.lookedAway || view.recentering;
   view.render();
   requestAnimationFrame(frame);
 }
