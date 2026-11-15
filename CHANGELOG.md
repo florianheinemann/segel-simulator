@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.7 – 2026-11-15
+
+- Lupen ohne Beschriftung; Fäden-Lupe und Draufsicht stehen links übereinander und sind kleiner
+
 ## 0.3.6 – 2026-11-15
 
 - Verklicker-Lupe deutlich größer und weiter herausgezoomt: Mast, Saling, Wanten

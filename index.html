@@ -44,8 +44,7 @@
     <div class="tile"><span class="lbl">GPS KüG · FüG</span><b id="iCog">000°</b> <span id="iSog" class="unit">0.0 kn</span></div>
   </div>
 
-  <div class="inset" id="vaneInset"><canvas id="insVane"></canvas><i id="vaneBow">vorn</i><span>Verklicker</span></div>
-  <div class="inset" id="tellInset"><canvas id="insTell"></canvas><span id="tellLabel">Fock-Fäden ⇄</span></div>
+  <div class="inset" id="vaneInset"><canvas id="insVane"></canvas><i id="vaneBow">vorn</i></div>
 
   <div id="leftcol">
     <div id="hint"></div>
@@ -61,6 +60,8 @@
   <div id="cmds" hidden></div>
   <div id="report" hidden></div>
 
+  <div id="leftstack">
+    <div class="inset" id="tellInset"><canvas id="insTell"></canvas></div>
   <svg id="topview" viewBox="-50 -50 100 100" aria-hidden="true">
     <circle r="47" class="tvbg"/>
     <g id="tvMark"><circle cx="0" cy="-43" r="4" class="mark"/></g>
@@ -72,7 +73,8 @@
     <line id="tvBoom" x1="0" y1="-5" x2="0" y2="14" class="sail"/>
     <line id="tvRud" x1="0" y1="20" x2="0" y2="28" class="rud"/>
   </svg>
-  <div id="tvLegend"><i class="l-aw"></i>scheinbar <i class="l-tw"></i>wahr<span id="tvMarkLbl"> <i class="l-mk"></i>Tonne</span></div>
+  </div>
+  
 
   <div id="bottom">
     <div class="sheet" id="sheetMain">
@@ -128,6 +130,7 @@
       <button id="restart">Neu starten</button>
       <button id="closeMenu" class="primary">Weiter segeln</button>
     </div>
+    <p class="help">Lupen: oben rechts der Verklicker, links die Windfäden (antippen wechselt zwischen Fock und Groß), darunter die Draufsicht – blauer Pfeil = scheinbarer Wind, gestrichelt = wahrer Wind, oranger Punkt = nächste Tonne, oranger Pfeil = Strom.</p>
     <p class="help">Kurs abfahren: vier Tonnen im Viereck – aufkreuzen zur Luvtonne, Halbwind, raumschots zur Leetonne, Halbwind ins Ziel. Eine Tonne gilt als erreicht, wenn du näher als 40 m herankommst.</p>
     <p class="help">Manöver: „Kommandos“ öffnet die Tafel. Die Crew arbeitet nur auf Kommando – auch die Fock geht erst mit „Über die Fock!“ über. Mit „Schoten im Manöver selbst bedienen“ (ab Stufe 2) sagt die Crew nur an, und du holst und fierst selbst.</p>
     <p class="help">Rad: Schieber bleibt stehen, wo du ihn loslässt; die Knöpfe daneben legen je 1° Ruder nach Bb/Stb (halten = weiter). Über die See ziehen = umsehen, „Blick voraus“ schwenkt zurück. Tastatur: ←/→ Ruder, Q/A Groß, W/S Fock, Leertaste Pause. ⏸ hält an, „1×“ schaltet auf halbe und viertel Geschwindigkeit.</p>

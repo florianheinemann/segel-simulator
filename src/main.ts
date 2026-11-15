@@ -123,7 +123,7 @@ lookBtn.addEventListener('click', () => { view.recentering = true; });
 
 $('tellInset').addEventListener('click', () => {
   view.tellTarget = view.tellTarget === 'jib' ? 'main' : 'jib';
-  $('tellLabel').textContent = view.tellTarget === 'jib' ? 'Fock-Fäden ⇄' : 'Groß-Fäden ⇄';
+  toast(view.tellTarget === 'jib' ? 'Lupe: Fäden an der Fock' : 'Lupe: Fäden am Achterliek des Groß', 'info');
 });
 
 // ---- Meldungen ----------------------------------------------------------------
@@ -180,7 +180,7 @@ function setCourse(on: boolean) {
     view.setCourse([], 0);
   }
   $('course').hidden = $('markTag').hidden = !on;
-  $('tvMark').style.display = $('tvMarkLbl').style.display = on ? '' : 'none';
+  $('tvMark').style.display = on ? '' : 'none';
   $('courseBtn').textContent = on ? 'Kurs beenden' : 'Kurs abfahren';
 }
 function updateCourse(dt: number) {
@@ -190,7 +190,7 @@ function updateCourse(dt: number) {
   view.setCourse(course.marks, course.idx);
   if (hit === 'mark') {
     const n = course.next!;
-    toast(`${course.marks[course.idx - 1].name} erreicht – weiter: ${n.name}`, 'info');
+    toast(`${course.marks[course.idx - 1].name} erreicht – weiter: ${n.name} (${n.leg})`, 'info');
   } else {
     const man = courseStats.clean + courseStats.flawed;
     showReport({
@@ -294,7 +294,7 @@ function updateHud() {
   if (course && !course.done) {
     const m = course.next!;
     rot('tvMark', course.bearingTo(sim) - sim.heading);
-    $('course').innerHTML = `<b>${m.name}</b> (${course.idx + 1}/${course.marks.length}) · peilt ${deg3(course.bearingTo(sim))} · ${course.distanceTo(sim).toFixed(0)} m · ${mmss(course.time)}<span class="pos">${m.leg}</span>`;
+    $('course').innerHTML = `<b>${m.name}</b> (${course.idx + 1}/${course.marks.length}) · peilt ${deg3(course.bearingTo(sim))} · ${course.distanceTo(sim).toFixed(0)} m · ${mmss(course.time)}`;
   }
   if (prefs.hint) {
     const pos = `${pointOfSail(sim.twa)} · ${bug()} (Wind von ${sim.mainSide > 0 ? 'Stb' : 'Bb'})`;
@@ -326,7 +326,7 @@ function syncMenu() {
   $('oCur').textContent = `${c.currentKn.toFixed(1)} kn`;
   $('oSet').textContent = deg3(c.currentSet);
   document.body.classList.toggle('auto', sim.autoTrim);
-  $('topview').style.display = $('tvLegend').style.display = prefs.top ? '' : 'none';
+  $('topview').style.display = prefs.top ? '' : 'none';
   $('hint').style.display = prefs.hint ? '' : 'none';
   if (!prefs.hint) $('hint').textContent = '';
   savePrefs();
