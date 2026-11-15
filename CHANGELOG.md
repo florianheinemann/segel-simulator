@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 – 2026-11-15
+
+- Verklicker-Lupe besser lesbar: weiterer Ausschnitt mit Mast und Segelkopf,
+  größerer Verklicker, Marke „vorn“ am Rand zeigt die Richtung zum Bug
+
 ## 0.2.0 – 2026-11-15
 
 Wende und Halse mit Kommandos.

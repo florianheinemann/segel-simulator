@@ -167,7 +167,9 @@ export class View {
   renderer: THREE.WebGLRenderer;
   scene = new THREE.Scene();
   cam = new THREE.PerspectiveCamera(62, 2, 0.3, 40000);
-  private vaneCam = new THREE.PerspectiveCamera(7.5, 1, 1, 40000);
+  private vaneCam = new THREE.PerspectiveCamera(15, 1, 1, 40000);
+  /** Richtung „voraus“ in der Verklicker-Lupe (Bildschirmkoordinaten, normiert) */
+  vaneBow = { x: 0, y: 1 };
   private tellCam = new THREE.PerspectiveCamera(11, 1, 1, 40000);
   private yawG = new THREE.Group();
   private heelG = new THREE.Group();
@@ -406,7 +408,7 @@ export class View {
     };
     const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, 0.95), black);
     arrow.add(shaft);
-    arrow.add(tri([0, 0, -0.62, -0.09, 0, -0.38, 0.09, 0, -0.38], black)); // Spitze
+    arrow.add(tri([0, 0, -0.66, -0.15, 0, -0.3, 0.15, 0, -0.3], black)); // Spitze
     arrow.add(tri([0, 0, 0.2, -0.16, 0, 0.62, 0.16, 0, 0.62], black)); // Fahne
     arrow.name = 'arrow';
     this.vane.add(arrow);
@@ -421,6 +423,8 @@ export class View {
       arm.position.y = -0.06;
       this.vane.add(arm);
     }
+    // bewusst überzeichnet, damit er in der Lupe trotz weitem Ausschnitt lesbar bleibt
+    this.vane.scale.setScalar(2);
     g.add(this.vane);
 
     // Steuersäule und Rad
@@ -557,6 +561,12 @@ export class View {
     const eye = this.eyeG.getWorldPosition(V(0, 0, 0));
     this.vaneCam.position.copy(eye);
     this.vaneCam.lookAt(this.vane.getWorldPosition(p));
+    this.vaneCam.updateMatrixWorld();
+    // wohin zeigt „voraus“ im Bild? (für die Marke am Lupenrand)
+    const ahead = this.heelG.localToWorld(V(0, MAST_TOP + 0.45, MAST_Z - 3)).project(this.vaneCam);
+    const len = Math.hypot(ahead.x, ahead.y) || 1;
+    this.vaneBow.x = ahead.x / len;
+    this.vaneBow.y = -ahead.y / len;
     this.tellCam.position.copy(eye);
     if (this.tellTarget === 'jib') {
       this.jibSail.point(0.19, 0.42, p);

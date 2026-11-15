@@ -123,3 +123,5 @@ body.auto #crewNote { display: block; }
 #report b { font-size: 15px; }
 #report ul { margin: 6px 0; padding-left: 18px; }
 #report small { color: var(--dim); }
+
+#vaneBow { position: absolute; transform: translate(-50%, -50%); font-style: normal; font-size: 9.5px; font-weight: 600; color: #1c1400; background: var(--accent); padding: 1px 5px; border-radius: 7px; pointer-events: none; }
