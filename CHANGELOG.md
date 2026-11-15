@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3 – 2026-11-15
+
+- Option „Schoten im Manöver selbst bedienen“ (ab Stufe 2): Die Crew sagt nur an; Großschot dichtholen und fieren sowie die Fock nach dem Übergehen dichtholen macht man selbst
+
 ## 0.3.2 – 2026-11-15
 
 - Fäden-Lupe: auf tiefen Kursen verdeckt der Mast die Fock-Fäden nicht mehr (der Blick weicht nach Luv aus)

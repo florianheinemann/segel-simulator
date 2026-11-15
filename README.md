@@ -39,6 +39,10 @@ Fahrt), gibt es beim Anwählen eine Warnung mit dem Grund.
 | auf neuen Am-Wind-Kurs abfallen, Ruder stützen | „Rund achtern!“ und mit dem Heck durch den Wind |
 | | Baum ist über: „Fier auf die Großschot!“, dann „Über die Fock!“ |
 
+Mit der Option „Schoten im Manöver selbst bedienen“ (Menü, ab Stufe 2) sagt die
+Crew nur an: Großschot dichtholen und fieren macht man selbst, und nach „Über
+die Fock!“ ist die Schot los und muss dichtgeholt werden.
+
 Was schiefgehen kann: Ohne „Über die Fock!“ steht die Fock back und bremst. Mit
 zu wenig Fahrt verhungert die Wende im Wind. Kommt der Baum bei gefierter
 Großschot über, ist es eine Patenthalse. Nach dem Manöver zeigt eine kurze
@@ -138,4 +142,6 @@ Menü angezeigt.
 
 ## Fahrplan
 
-- Eigene Schotarbeit im Manöver.
+Die ursprünglich geplanten Punkte sind umgesetzt. Ideen für später: weitere
+Kurse, Mann-über-Bord-Manöver, Anlegen unter Segeln, andere Boote mit
+Ausweichregeln.

@@ -139,3 +139,5 @@ body.paused #gl { filter: saturate(0.45) brightness(0.85); }
 
 .seg.small { margin: 0; }
 .seg.small button { text-align: center; padding: 6px 4px; }
+/* Menü scrollt auf kleinen Bildschirmen – die Knöpfe bleiben unten sichtbar */
+.actions { position: sticky; bottom: -12px; background: #0f3049; padding: 8px 0 10px; margin-bottom: -4px; }

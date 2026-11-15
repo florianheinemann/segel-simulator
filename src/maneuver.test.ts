@@ -106,3 +106,50 @@ describe('Halse', () => {
     expect(t.reports[0].lines.join(' ')).toContain('Patenthalse');
   });
 });
+
+describe('Schoten selbst bedienen', () => {
+  it('Halse: Crew sagt nur an, die Großschot holt und fiert man selbst', () => {
+    const t = setup(165);
+    t.sim.cfg.level = 2;
+    t.sim.cfg.manualSheets = true;
+    t.sim.mainSheet = 80;
+    t.sim.jibSheet = 70;
+    t.run(5);
+    t.crew.command('klarHalse');
+    t.crew.command('holDicht');
+    t.run(3);
+    expect(t.sim.mainSheet).toBeGreaterThan(70); // niemand holt für einen dicht
+    t.sim.mainInput = 1;
+    t.run(8);
+    t.sim.mainInput = 0;
+    expect(t.said.some(([, m]) => m.includes('Großschot ist dicht'))).toBe(true);
+    t.crew.command('rundAchtern');
+    t.steer(-150);
+    let step = 0;
+    t.run(40, () => {
+      const a = t.crew.active;
+      if (!a) return;
+      if (a.tOver != null && step === 0) { t.crew.command('fierGross'); t.sim.mainInput = -1; step = 1; }
+      if (step === 1 && t.sim.mainSheet > 70) { t.sim.mainInput = 0; t.crew.command('ueberFock'); step = 2; }
+    });
+    expect(t.reports).toHaveLength(1);
+    expect(t.reports[0].ok).toBe(true);
+  });
+
+  it('Wende: nach „Über die Fock!“ ist die Schot los und muss dichtgeholt werden', () => {
+    const t = setup(45);
+    t.sim.cfg.level = 2;
+    t.sim.cfg.manualSheets = true;
+    t.sim.mainSheet = 8;
+    t.sim.jibSheet = 14;
+    t.run(20);
+    t.crew.command('klarWende');
+    t.crew.command('ree');
+    t.steer(-45);
+    let passed = false;
+    t.run(15, () => {
+      if (t.sim.jibBack && !passed) { t.crew.command('ueberFock'); passed = true; }
+    });
+    expect(t.sim.jibSheet).toBeGreaterThan(50);
+  });
+});

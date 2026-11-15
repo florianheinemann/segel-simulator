@@ -29,6 +29,8 @@ export interface Config {
   gusts: boolean;
   /** Reffstufe: 0 = ungerefft, 1 oder 2 (Groß gerefft, Fock entsprechend eingerollt) */
   reef: number;
+  /** Ab Stufe 2: im Manöver holt und fiert man die Schoten selbst, die Crew sagt nur an */
+  manualSheets: boolean;
 }
 
 export function levelPreset(level: Level): Pick<Config, 'level' | 'currentKn' | 'gusts'> {
@@ -41,6 +43,7 @@ export const defaultConfig = (): Config => ({
   twd: 0,
   currentSet: 90,
   reef: 0,
+  manualSheets: false,
 });
 
 export const SHEET = { mainMin: 4, mainMax: 85, jibMin: 9, jibMax: 75 };

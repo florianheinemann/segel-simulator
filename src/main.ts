@@ -314,6 +314,9 @@ function syncMenu() {
   $<HTMLInputElement>('cGust').checked = c.gusts;
   $<HTMLInputElement>('cTop').checked = prefs.top;
   $<HTMLInputElement>('cHint').checked = prefs.hint;
+  $<HTMLInputElement>('cManual').checked = c.manualSheets;
+  $<HTMLInputElement>('cManual').disabled = c.level === 1;
+  $('manualLbl').style.opacity = c.level === 1 ? '0.45' : '';
   $('oBft').textContent = `${c.bft} Bft`;
   $('oReef').textContent = c.reef ? `${c.reef}. Reff` : 'ungerefft';
   document.querySelectorAll<HTMLButtonElement>('#reefs button').forEach((b) => b.classList.toggle('on', +b.dataset.reef! === c.reef));
@@ -352,6 +355,7 @@ bind('sSet', (el) => (sim.cfg.currentSet = +el.value));
 bind('cGust', (el) => (sim.cfg.gusts = el.checked));
 bind('cTop', (el) => (prefs.top = el.checked));
 bind('cHint', (el) => (prefs.hint = el.checked));
+bind('cManual', (el) => (sim.cfg.manualSheets = el.checked));
 showCmds(prefs.cmds);
 setCourse(false);
 $('ver').textContent = `v${__APP_VERSION__} · Build ${__BUILD__.split('+')[1]}`;

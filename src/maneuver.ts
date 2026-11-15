@@ -44,6 +44,7 @@ interface Active {
   stallTime: number;
   hauling: boolean;
   eased: boolean;
+  easeCalled: boolean;
   mistakes: string[];
 }
 
@@ -66,6 +67,10 @@ export class Crew {
     this.sim.crewMain = null;
   }
 
+  /** Schotarbeit im Manöver macht der Spieler selbst (nur ab Stufe 2 sinnvoll) */
+  private get manual() {
+    return !!this.sim.cfg.manualSheets && this.sim.cfg.level > 1;
+  }
   private get side() {
     return this.sim.awa >= 0 ? 1 : -1;
   }
@@ -76,7 +81,7 @@ export class Crew {
     const s = this.sim;
     this.active = {
       kind, stage: 'klar', s0: this.side, u0: s.u, uMin: s.u, t0: s.t, tStage: s.t,
-      tOver: null, tGo: null, jibBackTime: 0, stallTime: 0, hauling: false, eased: false, mistakes: [],
+      tOver: null, tGo: null, jibBackTime: 0, stallTime: 0, hauling: false, eased: false, easeCalled: false, mistakes: [],
     };
     this.say('crew', 'Crew: „Ist klar!“');
   }
@@ -119,9 +124,15 @@ export class Crew {
         }
         if (a?.kind === 'halse' && a.tOver === null) this.mistake('Fock vor dem Groß übergeholt.');
         s.passJib();
+        if (this.manual) {
+          // alte Schot ist los – die neue muss man selbst dichtholen
+          s.jibSheet = Math.max(s.jibSheet, 62);
+          return this.say('crew', 'Crew: „Fock ist los!“ – Fockschot dichtholen');
+        }
         return this.say('crew', 'Crew: „Fock ist über!“');
 
       case 'fierSchoten':
+        if (this.manual) return this.say('crew', 'Crew: „Klar zum Fieren.“ – Schoten selbst fieren');
         this.trimTimer = a ? 90 : 5;
         return this.say('crew', 'Crew: „Schoten werden gefiert.“');
 
@@ -129,8 +140,9 @@ export class Crew {
         if (!a || a.kind !== 'halse') return this.say('crew', 'Crew: „Wozu? Es ist keine Halse angesagt.“');
         if (a.tOver !== null) return this.say('crew', 'Crew: „Der Baum ist schon über.“');
         if (twa < 150) this.mistake('Großschot dichtgeholt, bevor das Boot fast vor dem Wind lag.');
-        s.crewMain = { target: SHEET.mainMin + 2, hold: true };
         a.hauling = true;
+        if (this.manual) return this.say('crew', 'Großschot dichtholen (Knopf „dicht“ halten)');
+        s.crewMain = { target: SHEET.mainMin + 2, hold: true };
         return this.say('crew', 'Crew holt die Großschot dicht …');
 
       case 'rundAchtern':
@@ -153,6 +165,10 @@ export class Crew {
         if (a.tOver === null) {
           this.mistake('Großschot gefiert, bevor der Baum über war.');
           a.hauling = false;
+        }
+        if (this.manual) {
+          a.easeCalled = true;
+          return this.say('crew', 'Großschot fieren (Knopf „fieren“ halten)');
         }
         s.crewMain = null;
         a.eased = true;
@@ -251,7 +267,11 @@ export class Crew {
       a.tGo = a.tGo ?? s.t;
       this.stage('rund');
     }
-    if (a.tOver !== null && !a.eased && s.t - a.tOver > 20) {
+    if (this.manual && a.tOver !== null && !a.eased && s.mainSheet > 30) {
+      if (!a.easeCalled) this.mistake('Großschot gefiert, ohne „Fier auf die Großschot!“ anzusagen.');
+      a.eased = true;
+    }
+    if (!this.manual && a.tOver !== null && !a.eased && s.t - a.tOver > 20) {
       this.mistake('„Fier auf die Großschot!“ kam nicht – die Crew hat von selbst gefiert.');
       s.crewMain = null;
       a.eased = true;
@@ -277,10 +297,11 @@ export class Crew {
       if (a.stage === 'klar') return 'Wende: „Ree!“ rufen und zügig anluven (Ruder nach Luv).';
       if (!crossed) return 'Wende: weiter durch den Wind drehen.';
       if (s.jibSide !== this.side) return 'Wende: Bug ist durch den Wind – „Über die Fock!“.';
+      if (this.manual && s.alphaJib < 6) return 'Wende: Fockschot dichtholen (Knopf „dicht“ halten).';
       return 'Wende: auf den neuen Am-Wind-Kurs abfallen und das Ruder stützen.';
     }
     if (a.tOver === null) {
-      if (a.hauling) return 'Halse: Crew holt die Großschot dicht – Kurs halten.';
+      if (a.hauling) return this.manual ? 'Halse: Großschot dichtholen (Knopf „dicht“ halten) – Kurs halten.' : 'Halse: Crew holt die Großschot dicht – Kurs halten.';
       if (a.stage === 'klar')
         return twa < 150
           ? 'Halse: abfallen bis fast vor den Wind, dabei „Fier auf die Schoten!“.'
@@ -288,7 +309,7 @@ export class Crew {
       if (a.stage === 'dicht') return 'Halse: „Rund achtern!“ und mit dem Heck durch den Wind steuern.';
       return 'Halse: weiter abfallen, bis der Baum überkommt.';
     }
-    if (!a.eased) return 'Halse: Baum ist über – „Fier auf die Großschot!“ und Ruder stützen.';
+    if (!a.eased) return this.manual && a.easeCalled ? 'Halse: Großschot fieren (Knopf „fieren“ halten) und Ruder stützen.' : 'Halse: Baum ist über – „Fier auf die Großschot!“ und Ruder stützen.';
     if (s.jibSide !== this.side) return 'Halse: „Über die Fock!“';
     return 'Halse: neuen Raumschotskurs steuern.';
   }
