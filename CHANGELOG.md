@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.1 – 2026-11-15
+
+Homescreen-App für das iPhone.
+
+- Automatische Aktualisierung: Beim Start und bei jeder Rückkehr in die App wird
+  geprüft, ob ein neuerer Build online ist, und dann neu geladen
+- Service Worker neu: `index.html` immer frisch aus dem Netz, alte Caches werden
+  gelöscht, alle Dateien werden schon beim ersten Besuch für offline gespeichert
+- Startbilder für gängige iPhones (hoch und quer), Ladebild in der App
+- Icons in 180, 192 und 512 px, Manifest ergänzt
+- Bildschirm bleibt beim Segeln an (wo der Browser es unterstützt)
+- Build-Kennung im Menü
+
 ## 0.1.0 – 2026-11-15
 
 Erste Version.

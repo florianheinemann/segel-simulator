@@ -1,8 +1,10 @@
 import './style.css';
 import { Config, Level, MS2KN, RUDDER_MAX, SHEET, Sim, defaultConfig, levelPreset, pointOfSail } from './sim';
 import { View } from './scene';
+import { initPwa } from './pwa';
 
 declare const __APP_VERSION__: string;
+declare const __BUILD__: string;
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const deg3 = (v: number) => String(Math.round(v) % 360).padStart(3, '0') + '°';
 
@@ -193,7 +195,7 @@ bind('sSet', (el) => (sim.cfg.currentSet = +el.value));
 bind('cGust', (el) => (sim.cfg.gusts = el.checked));
 bind('cTop', (el) => (prefs.top = el.checked));
 bind('cHint', (el) => (prefs.hint = el.checked));
-$('ver').textContent = `v${__APP_VERSION__}`;
+$('ver').textContent = `v${__APP_VERSION__} · Build ${__BUILD__.split('+')[1]}`;
 syncMenu();
 
 // ---- Hauptschleife ---------------------------------------------------------------
@@ -215,6 +217,12 @@ function frame(now: number) {
 }
 view.update(sim, 0);
 updateHud();
-requestAnimationFrame(frame);
+requestAnimationFrame((t) => {
+  frame(t);
+  // Ladebild ausblenden, sobald das erste Bild steht
+  const boot = $('boot');
+  boot.classList.add('gone');
+  setTimeout(() => boot.remove(), 500);
+});
+initPwa();
 
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});

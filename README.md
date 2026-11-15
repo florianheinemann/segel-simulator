@@ -37,6 +37,22 @@ einstellbar. Die Küste mit ihren Landmarken (Leuchtturm, Kirche, Windräder,
 Funkmast) liegt rund 7 km entfernt. Wer ihr auf etwa die Hälfte nahekommt, wird
 in die Reviermitte zurückgesetzt.
 
+## Auf dem iPhone installieren
+
+1. Die Seite in Safari öffnen.
+2. „Teilen“ → „Zum Home-Bildschirm“.
+3. Vom Home-Bildschirm starten und das iPhone quer halten.
+
+Die App läuft dann im Vollbild und nach dem ersten Laden auch offline.
+
+**Aktualisierung:** Die App prüft beim Start und jedes Mal, wenn sie aus dem
+Hintergrund zurückkommt, ob online ein neuerer Build liegt (`version.json`), und
+lädt sich dann selbst neu. Ohne Verbindung läuft die zuletzt geladene Version
+weiter. Welche Version läuft, steht im Menü (☰) neben dem Titel.
+
+Wer Icon oder Startbild ändert, muss die App vom Home-Bildschirm löschen und neu
+hinzufügen – iOS übernimmt beides nur beim Hinzufügen.
+
 ## Modell (vereinfacht)
 
 - Scheinbarer Wind aus wahrem Wind, Strom und Bootsbewegung.
@@ -50,7 +66,9 @@ in die Reviermitte zurückgesetzt.
 
 Die Physik liegt in `src/sim.ts` (ohne Rendering, mit Tests in
 `src/sim.test.ts`), die 3D-Szene in `src/scene.ts`, die Bedienung in
-`src/main.ts`.
+`src/main.ts`, Offline-Cache und Aktualisierung in `src/pwa.ts` und
+`public/sw.js`. Icons und Startbilder erzeugt `node scripts/gen-assets.cjs` aus
+`public/icon.svg` (braucht Playwright).
 
 ## Entwicklung
 
