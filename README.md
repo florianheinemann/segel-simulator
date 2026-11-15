@@ -19,6 +19,7 @@ Home-Bildschirm hinzufügen.
 | Lupe „Fäden“ | Windfäden an der Fock (Bb rot, Stb grün); Antippen wechselt zu den Achterliekfäden am Groß. |
 | Instrumente | Kompasskurs, Fahrt durchs Wasser (FdW), scheinbarer Wind, Krängung, GPS (KüG/FüG). |
 | Rad | Schieber, der stehen bleibt, wo man ihn loslässt – so sieht man, wie viel Ruder man gegen die Luvgierigkeit hält. Die Knöpfe daneben legen je 1° nach Bb/Stb. |
+| Pause / Zeitlupe | ⏸ hält die Simulation an, „1×“ schaltet auf halbe und viertel Geschwindigkeit – praktisch zum Üben der Manöver. |
 | Schoten | „fieren“ / „dicht“ für Groß und Fock, gedrückt halten (ab Stufe 2). |
 | Draufsicht | Lernhilfe: Boot von oben mit scheinbarem (blau) und wahrem Wind (gestrichelt), Segelstellung, Ruder, Strom. Abschaltbar. |
 | Hinweiszeile | Lernhilfe: Kurs zum Wind, Bug und ein Trimm-Tipp. Abschaltbar. |

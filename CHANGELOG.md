@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 – 2026-11-15
+
+- Schaltflächen für Pause (⏸) und Zeitlupe (1× / ½× / ¼×) neben „Kommandos“
+
 ## 0.2.1 – 2026-11-15
 
 - Verklicker-Lupe besser lesbar: weiterer Ausschnitt mit Mast und Segelkopf,

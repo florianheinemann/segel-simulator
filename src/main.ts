@@ -26,6 +26,9 @@ const savePrefs = () => { try { localStorage.setItem(STORE, JSON.stringify(prefs
 const sim = new Sim(prefs.cfg);
 const view = new View($<HTMLCanvasElement>('gl'), $<HTMLCanvasElement>('insVane'), $<HTMLCanvasElement>('insTell'));
 let paused = false;
+// Zeitlupe: 1 = Echtzeit
+const SPEEDS = [1, 0.5, 0.25];
+let speed = 1;
 (window as unknown as Record<string, unknown>).__sim = sim;
 
 // ---- Ruder ------------------------------------------------------------------
@@ -71,7 +74,7 @@ const keys = new Set<string>();
 addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLInputElement && e.target !== wheel) return;
   const k = e.key.toLowerCase();
-  if (k === ' ') { paused = !paused; toast(paused ? 'Pause' : 'Weiter', 'info'); e.preventDefault(); return; }
+  if (k === ' ') { setPaused(!paused); e.preventDefault(); return; }
   if (['arrowleft', 'arrowright', 'q', 'a', 'w', 's'].includes(k)) { keys.add(k); e.preventDefault(); }
 });
 addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
@@ -85,6 +88,22 @@ function applyKeys(dt: number) {
   keyMain = m !== null; keyJib = j !== null;
 }
 let keyMain = false, keyJib = false;
+
+// ---- Pause und Zeitlupe -------------------------------------------------------
+function setPaused(p: boolean) {
+  paused = p;
+  const b = $('pauseBtn');
+  b.textContent = p ? '▶' : '⏸';
+  b.classList.toggle('on', p);
+  document.body.classList.toggle('paused', p);
+}
+$('pauseBtn').addEventListener('click', () => setPaused(!paused));
+$('speedBtn').addEventListener('click', () => {
+  speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length];
+  const b = $('speedBtn');
+  b.textContent = speed === 1 ? '1×' : speed === 0.5 ? '½×' : '¼×';
+  b.classList.toggle('on', speed !== 1);
+});
 
 // ---- Umsehen ------------------------------------------------------------------
 const gl = $('gl');
@@ -235,7 +254,12 @@ function syncMenu() {
   if (!prefs.hint) $('hint').textContent = '';
   savePrefs();
 }
-const openMenu = (open: boolean) => { menu.hidden = !open; paused = open; };
+let pausedBeforeMenu = false;
+const openMenu = (open: boolean) => {
+  if (open) pausedBeforeMenu = paused;
+  menu.hidden = !open;
+  setPaused(open || pausedBeforeMenu);
+};
 $('menuBtn').addEventListener('click', () => openMenu(true));
 $('closeMenu').addEventListener('click', () => openMenu(false));
 $('restart').addEventListener('click', () => { sim.reset(); crew.reset(); setRudder(0); $('report').hidden = true; openMenu(false); });
@@ -258,7 +282,7 @@ addEventListener('resize', () => view.resize());
 view.resize();
 let last = performance.now(), hudT = 0;
 function frame(now: number) {
-  const dt = Math.min(0.05, (now - last) / 1000);
+  const dt = Math.min(0.05, (now - last) / 1000) * speed;
   last = now;
   if (!paused) {
     applyKeys(dt);
