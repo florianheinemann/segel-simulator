@@ -112,10 +112,11 @@ export class Crew {
 
       case 'ree':
         if (!a || a.kind !== 'wende') return this.say('crew', 'Crew: „Wir sind nicht klar zur Wende!“');
-        if (a.stage !== 'klar') return;
+        if (a.stage !== 'klar') return this.say('info', '„Ree!“ ist schon gerufen – durch den Wind steuern.');
         a.tGo = s.t;
         this.stage('ree');
-        return;
+        // Das Kommando gilt dem Rudergänger selbst: jetzt Ruder legen
+        return this.say('info', `„Ree!“ – jetzt Ruder nach ${a.s0 > 0 ? 'Stb' : 'Bb'} legen und durch den Wind drehen`);
 
       case 'ueberFock':
         if (s.jibSide === this.side) {
@@ -147,14 +148,14 @@ export class Crew {
 
       case 'rundAchtern':
         if (!a || a.kind !== 'halse') return this.say('crew', 'Crew: „Wir sind nicht klar zur Halse!“');
-        if (a.stage === 'rund') return;
-        if (s.mainSheet > 15) {
-          this.mistake('„Rund achtern!“, obwohl die Großschot nicht dicht war.');
-          this.say('warn', 'Crew: „Die Großschot ist nicht dicht!“');
-        }
+        if (a.stage === 'rund') return this.say('info', '„Rund achtern!“ ist schon gerufen – weiter abfallen.');
         a.tGo = s.t;
         this.stage('rund');
-        return;
+        if (s.mainSheet > 15) {
+          this.mistake('„Rund achtern!“, obwohl die Großschot nicht dicht war.');
+          return this.say('warn', 'Crew: „Die Großschot ist nicht dicht!“');
+        }
+        return this.say('info', `„Rund achtern!“ – jetzt Ruder nach ${a.s0 > 0 ? 'Bb' : 'Stb'} legen, Heck durch den Wind`);
 
       case 'fierGross':
         if (!a || a.kind !== 'halse') {

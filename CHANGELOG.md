@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.4 – 2026-11-15
+
+- „Ree!“ und „Rund achtern!“ geben jetzt eine sichtbare Rückmeldung mit der Richtung, in die das Ruder zu legen ist
+
 ## 0.3.3 – 2026-11-15
 
 - Option „Schoten im Manöver selbst bedienen“ (ab Stufe 2): Die Crew sagt nur an; Großschot dichtholen und fieren sowie die Fock nach dem Übergehen dichtholen macht man selbst
