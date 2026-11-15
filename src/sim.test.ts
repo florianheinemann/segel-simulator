@@ -95,4 +95,23 @@ describe('Sim', () => {
     expect(sim.jibBack).toBe(false);
     expect(sim.u).toBeGreaterThan(slow);
   });
+
+  it('Reffen nimmt bei viel Wind Krängung und Ruderdruck heraus', () => {
+    const run6 = (reef: number) => {
+      const sim = new Sim({ ...defaultConfig(), ...levelPreset(2), bft: 6, reef, gusts: false, currentKn: 0 });
+      sim.heading = sim.cfg.twd - 50;
+      const hold = holdTwa(50);
+      run(sim, 120, (s) => {
+        hold(s);
+        s.mainSheet = Math.max(4, Math.abs(s.awa) - 17);
+        s.jibSheet = Math.max(9, Math.abs(s.awa) - 15);
+      });
+      return sim;
+    };
+    const full = run6(0), reefed = run6(2);
+    console.log(`6 Bft ungerefft: ${full.heel.toFixed(0)}° / ${(full.u * MS2KN).toFixed(1)} kn / Ruder ${full.rudder.toFixed(1)}°; 2. Reff: ${reefed.heel.toFixed(0)}° / ${(reefed.u * MS2KN).toFixed(1)} kn / Ruder ${reefed.rudder.toFixed(1)}°`);
+    expect(Math.abs(reefed.heel)).toBeLessThan(Math.abs(full.heel) - 8);
+    expect(Math.abs(reefed.rudder)).toBeLessThan(Math.abs(full.rudder));
+    expect(reefed.u).toBeGreaterThan(full.u * 0.9);
+  });
 });

@@ -240,7 +240,9 @@ function hintText(): string {
   const a = Math.abs(sim.awa), aj = sim.alphaJib, am = sim.alphaMain;
   if (sim.aws < 1) return 'Kaum Wind in den Segeln.';
   if (sim.byLee) return 'Wind fällt von der falschen Seite ein – Gefahr einer Patenthalse! Anluven oder bewusst halsen.';
-  if (Math.abs(sim.heel) > 30) return 'Viel Krängung, das Boot wird luvgierig: Großschot fieren oder etwas anluven.';
+  if (Math.abs(sim.heel) > 30) return sim.cfg.reef < 2 && sim.cfg.bft >= 5
+    ? 'Viel Krängung, das Boot wird luvgierig: Großschot fieren, anluven – oder reffen (Menü).'
+    : 'Viel Krängung, das Boot wird luvgierig: Großschot fieren oder etwas anluven.';
   const tightJ = sim.jibSheet <= SHEET.jibMin + 1, tightM = sim.mainSheet <= SHEET.mainMin + 1;
   if (aj < 2 && (tightJ || sim.autoTrim)) return 'Segel killen – du bist zu hoch am Wind. Abfallen!';
   if (sim.autoTrim) {
@@ -313,6 +315,8 @@ function syncMenu() {
   $<HTMLInputElement>('cTop').checked = prefs.top;
   $<HTMLInputElement>('cHint').checked = prefs.hint;
   $('oBft').textContent = `${c.bft} Bft`;
+  $('oReef').textContent = c.reef ? `${c.reef}. Reff` : 'ungerefft';
+  document.querySelectorAll<HTMLButtonElement>('#reefs button').forEach((b) => b.classList.toggle('on', +b.dataset.reef! === c.reef));
   $('oTwd').textContent = deg3(c.twd);
   $('oCur').textContent = `${c.currentKn.toFixed(1)} kn`;
   $('oSet').textContent = deg3(c.currentSet);
@@ -334,6 +338,12 @@ $('restart').addEventListener('click', () => { setCourse(false); sim.reset(); cr
 $('courseBtn').addEventListener('click', () => { $('report').hidden = true; setCourse(!course); openMenu(false); });
 document.querySelectorAll<HTMLButtonElement>('#levels button').forEach((b) =>
   b.addEventListener('click', () => { Object.assign(sim.cfg, levelPreset(+b.dataset.level! as Level)); syncMenu(); }));
+document.querySelectorAll<HTMLButtonElement>('#reefs button').forEach((b) =>
+  b.addEventListener('click', () => {
+    sim.cfg.reef = +b.dataset.reef!;
+    syncMenu();
+    toast(sim.cfg.reef ? `Crew bindet das ${sim.cfg.reef}. Reff ein` : 'Crew refft aus', 'crew');
+  }));
 const bind = (id: string, fn: (el: HTMLInputElement) => void) => $<HTMLInputElement>(id).addEventListener('input', (e) => { fn(e.target as HTMLInputElement); syncMenu(); });
 bind('sBft', (el) => (sim.cfg.bft = +el.value));
 bind('sTwd', (el) => { sim.cfg.twd = +el.value; sim.settleSails(); });

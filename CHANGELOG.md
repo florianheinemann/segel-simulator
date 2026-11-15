@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 – 2026-11-15
+
+- Reffen: im Menü 1. oder 2. Reff wählen – weniger Segelfläche, weniger Krängung und Ruderdruck; Groß und Fock werden sichtbar kleiner
+
 ## 0.3.0 – 2026-11-15
 
 Kursmodus.

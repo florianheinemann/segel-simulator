@@ -27,6 +27,8 @@ export interface Config {
   /** Richtung, in die der Strom setzt (Grad) */
   currentSet: number;
   gusts: boolean;
+  /** Reffstufe: 0 = ungerefft, 1 oder 2 (Groß gerefft, Fock entsprechend eingerollt) */
+  reef: number;
 }
 
 export function levelPreset(level: Level): Pick<Config, 'level' | 'currentKn' | 'gusts'> {
@@ -38,6 +40,7 @@ export const defaultConfig = (): Config => ({
   bft: 4,
   twd: 0,
   currentSet: 90,
+  reef: 0,
 });
 
 export const SHEET = { mainMin: 4, mainMax: 85, jibMin: 9, jibMax: 75 };
@@ -98,6 +101,8 @@ export class Sim {
   jibShadow = 1;
   /** Fock steht back: nach der Wende noch auf der alten (jetzt Luv-)Seite belegt */
   jibBack = false;
+  /** aktuelle Reffstufe, gleitet beim Ein- und Ausreffen (0..2) */
+  reef = 0;
   /** Crew trimmt vorübergehend mit (Kommando „Fier auf die Schoten!“) */
   crewTrim = false;
   /** Crew fährt die Großschot auf einen Wert; hold = dort festhalten (Halse) */
@@ -260,8 +265,10 @@ export class Sim {
         side: Math.max(0, q * area * (cl * ca + cd * sa) * k),
       };
     };
-    const fm = force(this.alphaMain, aM, AREA_MAIN);
-    const fj = force(this.alphaJib, this.jibBack ? absA : aJ, AREA_JIB * this.jibShadow);
+    // Reffen: weniger Segelfläche, und der Druckpunkt wandert nach unten (weniger Krängung)
+    this.reef = approach(this.reef, clamp(c.reef ?? 0, 0, 2), 0.25 * dt);
+    const fm = force(this.alphaMain, aM, AREA_MAIN * (1 - 0.25 * this.reef));
+    const fj = force(this.alphaJib, this.jibBack ? absA : aJ, AREA_JIB * (1 - 0.19 * this.reef) * this.jibShadow);
     // Seitenkräfte mit Vorzeichen (+ = nach Steuerbord)
     const sideM = -this.mainSide * fm.side;
     const sideJ = -(this.jibBack ? s : this.jibSide) * fj.side;
@@ -280,7 +287,7 @@ export class Sim {
     this.u += ((drive - resist) / MASS) * dt;
 
     // --- Krängung und Abdrift --------------------------------------------------
-    const heelTarget = clamp(side / 185, -55, 55);
+    const heelTarget = clamp(((sideM + sideJ) * (1 - 0.1 * this.reef) + hullSide) / 185, -55, 55);
     this.heel += (heelTarget - this.heel) * Math.min(1, dt / 1.3);
     const vLatTarget = clamp(side / (4000 * (au + 0.7)), -1.3, 1.3);
     this.vLat += (vLatTarget - this.vLat) * Math.min(1, dt / 1.0);

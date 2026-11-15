@@ -97,6 +97,7 @@ hinzufügen – iOS übernimmt beides nur beim Hinzufügen.
   und Querkraft (Auftrieb/Widerstand), Killen und Strömungsabriss.
 - Krängung aus der Querkraft, Abdrift nach Lee, Rumpfwiderstand mit
   Rumpfgeschwindigkeit.
+- Reffen in zwei Stufen (Menü): weniger Segelfläche und tieferer Druckpunkt.
 - Luvgierigkeit aus Krängung und Segelbalance (Groß luvgierig, Fock leegierig).
 - Patenthalse, wenn der Wind bei gefiertem Groß von Lee einfällt.
 - Wellen sind nur Optik.
@@ -137,4 +138,4 @@ Menü angezeigt.
 
 ## Fahrplan
 
-- Reffen, eigene Schotarbeit im Manöver.
+- Eigene Schotarbeit im Manöver.

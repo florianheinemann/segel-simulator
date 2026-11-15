@@ -511,15 +511,15 @@ export class View {
     this.boomMesh.rotation.y = sim.boom * DEG;
     const flapM = sim.alphaMain < 2 && sim.aws > 1 ? 1 - sim.alphaMain / 2 : 0;
     this.main.set(
-      V(0, BOOM_Y + 0.1, MAST_Z), V(0, MAST_TOP - 0.3, MAST_Z),
+      V(0, BOOM_Y + 0.1, MAST_Z), V(0, MAST_TOP - 0.3 - 2.7 * sim.reef, MAST_Z),
       V(sm * BOOM_LEN, BOOM_Y + 0.1, MAST_Z + cm * BOOM_LEN),
       -sim.mainSide, 0.09, flapM, t,
     );
     const sj = Math.sin(sim.jib * DEG), cj = Math.cos(sim.jib * DEG);
     const flapJ = sim.alphaJib < 2 && sim.aws > 1 ? 1 - sim.alphaJib / 2 : 0;
     this.jibSail.set(
-      JIB_TACK, JIB_HEAD,
-      V(JIB_TACK.x + sj * JIB_FOOT, 1.9, JIB_TACK.z + cj * JIB_FOOT),
+      JIB_TACK, JIB_TACK.clone().lerp(JIB_HEAD, 1 - 0.17 * sim.reef),
+      V(JIB_TACK.x + sj * JIB_FOOT * (1 - 0.17 * sim.reef), 1.9, JIB_TACK.z + cj * JIB_FOOT * (1 - 0.17 * sim.reef)),
       sim.jibBack ? -Math.sign(sim.awa || 1) : -sim.jibSide, 0.1, flapJ, t,
     );
 
