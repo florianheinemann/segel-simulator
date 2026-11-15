@@ -437,9 +437,15 @@ export class View {
     g.add(this.wheel);
   }
 
+  private sized = '';
+  /** Passt die Zeichenfläche an, sobald sich die Größe ändert – wird in jedem Bild geprüft,
+   *  weil iOS beim Drehen das resize-Ereignis teils vor dem neuen Layout meldet. */
   resize() {
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
     const pr = Math.min(window.devicePixelRatio || 1, 2);
+    const key = `${w}x${h}@${pr}/${this.insets[0].ctx.canvas.clientWidth}`;
+    if (key === this.sized || w === 0 || h === 0) return;
+    this.sized = key;
     this.renderer.setPixelRatio(pr);
     this.renderer.setSize(w, h, false);
     this.cam.aspect = w / h;
@@ -553,6 +559,7 @@ export class View {
   }
 
   render() {
+    this.resize();
     const r = this.renderer;
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
     const pr = r.getPixelRatio();

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2 – 2026-11-15
+
+- Behoben: Nach dem Drehen des iPhones (Start im Hochformat) blieb die obere
+  Bildhälfte schwarz und das Bild war verzerrt
+
 ## 0.1.1 – 2026-11-15
 
 Homescreen-App für das iPhone.
