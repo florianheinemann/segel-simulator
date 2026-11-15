@@ -599,6 +599,16 @@ export class View {
     if (this.tellTarget === 'jib') {
       this.jibSail.point(0.19, 0.42, p);
       this.tellCam.fov = 9;
+      // Bei gefierter Fock läge der Mast genau in der Sichtlinie. Der Rudergänger
+      // lehnt sich dann weiter nach Luv, bis er am Mast vorbei auf die Fäden sieht.
+      const side = this.luvX >= 0 ? 1 : -1;
+      const tl = this.yawG.worldToLocal(this.heelG.localToWorld(p.clone()));
+      const f = (EYE.z - MAST_Z) / (EYE.z - tl.z);
+      const hLine = EYE.y + f * (tl.y - EYE.y);
+      const mx = this.yawG.worldToLocal(this.heelG.localToWorld(V(0, hLine, MAST_Z))).x;
+      const need = (0.4 + side * (mx - f * tl.x)) / (1 - f);
+      const ex = side * Math.min(2.1, Math.max(Math.abs(this.luvX), need));
+      this.tellCam.position.copy(this.yawG.localToWorld(V(ex, EYE.y, EYE.z)));
     } else {
       this.main.point(0.9, 0.5, p);
       this.tellCam.fov = 30;
