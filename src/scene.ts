@@ -16,6 +16,9 @@ const EYE = V(0, 2.9, 4.5);
 const COAST_R = 7000;
 const HORIZON = new THREE.Color(0xcfe2ec);
 const LOOK_PITCH = -0.05;
+// Verklicker-Lupe: weiter Blick nach oben am Mast entlang, so dass Saling und Segel im Bild sind
+const VANE_FOV = 36;
+const VANE_AIM_Y = 12.4;
 
 /** Segel als verformbares Dreiecksgitter mit Bauch nach Lee */
 class Sail {
@@ -167,8 +170,8 @@ export class View {
   renderer: THREE.WebGLRenderer;
   scene = new THREE.Scene();
   cam = new THREE.PerspectiveCamera(62, 2, 0.3, 40000);
-  private vaneCam = new THREE.PerspectiveCamera(15, 1, 1, 40000);
-  /** Richtung „voraus“ in der Verklicker-Lupe (Bildschirmkoordinaten, normiert) */
+  private vaneCam = new THREE.PerspectiveCamera(VANE_FOV, 1, 1, 40000);
+  /** Position der Marke „vorn“ in der Verklicker-Lupe (-1..1 von der Mitte, y nach unten) */
   vaneBow = { x: 0, y: 1 };
   private tellCam = new THREE.PerspectiveCamera(11, 1, 1, 40000);
   private yawG = new THREE.Group();
@@ -197,7 +200,6 @@ export class View {
   /** 'jib' oder 'main' – worauf das Fäden-Fenster zielt */
   tellTarget: 'jib' | 'main' = 'jib';
   private insets: { ctx: CanvasRenderingContext2D; cam: THREE.Camera }[];
-  private insetPx = 0;
 
   constructor(private canvas: HTMLCanvasElement, vaneCanvas: HTMLCanvasElement, tellCanvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -458,7 +460,7 @@ export class View {
       this.vane.add(arm);
     }
     // bewusst überzeichnet, damit er in der Lupe trotz weitem Ausschnitt lesbar bleibt
-    this.vane.scale.setScalar(2);
+    this.vane.scale.setScalar(2.6);
     g.add(this.vane);
 
     // Steuersäule und Rad
@@ -486,7 +488,7 @@ export class View {
   resize() {
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
     const pr = Math.min(window.devicePixelRatio || 1, 2);
-    const key = `${w}x${h}@${pr}/${this.insets[0].ctx.canvas.clientWidth}`;
+    const key = `${w}x${h}@${pr}/${this.insets.map((i) => i.ctx.canvas.clientWidth).join('/')}`;
     if (key === this.sized || w === 0 || h === 0) return;
     this.sized = key;
     this.renderer.setPixelRatio(pr);
@@ -495,9 +497,11 @@ export class View {
     // auf schmalen Bildschirmen etwas weitwinkliger
     this.cam.fov = w / h > 1.9 ? 58 : 64;
     this.cam.updateProjectionMatrix();
-    const c = this.insets[0].ctx.canvas;
-    this.insetPx = Math.min(Math.round(c.clientWidth * pr), Math.floor(Math.min(w, h) * pr));
-    for (const { ctx } of this.insets) ctx.canvas.width = ctx.canvas.height = this.insetPx;
+    // jede Lupe in ihrer eigenen Größe
+    for (const { ctx } of this.insets) {
+      const c = ctx.canvas;
+      c.width = c.height = Math.min(Math.round(c.clientWidth * pr), Math.floor(Math.min(w, h) * pr));
+    }
   }
 
   update(sim: Sim, dt: number) {
@@ -594,13 +598,19 @@ export class View {
     this.scene.updateMatrixWorld();
     const eye = this.eyeG.getWorldPosition(V(0, 0, 0));
     this.vaneCam.position.copy(eye);
-    this.vaneCam.lookAt(this.vane.getWorldPosition(p));
+    this.vaneCam.lookAt(this.heelG.localToWorld(p.set(0, VANE_AIM_Y, MAST_Z)));
     this.vaneCam.updateMatrixWorld();
     // wohin zeigt „voraus“ im Bild? (für die Marke am Lupenrand)
+    const top = this.heelG.localToWorld(V(0, MAST_TOP + 0.45, MAST_Z)).project(this.vaneCam);
     const ahead = this.heelG.localToWorld(V(0, MAST_TOP + 0.45, MAST_Z - 3)).project(this.vaneCam);
-    const len = Math.hypot(ahead.x, ahead.y) || 1;
-    this.vaneBow.x = ahead.x / len;
-    this.vaneBow.y = -ahead.y / len;
+    const dx = ahead.x - top.x, dy = ahead.y - top.y;
+    const len = Math.hypot(dx, dy) || 1;
+    // Marke sitzt vom Verklicker aus in Richtung Bug, bleibt aber innerhalb der Lupe
+    let bx = top.x + (dx / len) * 0.42, by = top.y + (dy / len) * 0.42;
+    const r = Math.hypot(bx, by);
+    if (r > 0.8) { bx *= 0.8 / r; by *= 0.8 / r; }
+    this.vaneBow.x = bx;
+    this.vaneBow.y = -by;
     this.tellCam.position.copy(eye);
     if (this.tellTarget === 'jib') {
       this.jibSail.point(0.19, 0.42, p);
@@ -628,13 +638,14 @@ export class View {
     const r = this.renderer;
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
     const pr = r.getPixelRatio();
-    const S = this.insetPx / pr;
     r.setScissorTest(true);
     for (const { ctx, cam } of this.insets) {
+      const px = ctx.canvas.width, S = px / pr;
+      if (!px) continue;
       r.setViewport(0, 0, S, S);
       r.setScissor(0, 0, S, S);
       r.render(this.scene, cam);
-      ctx.drawImage(this.canvas, 0, this.canvas.height - this.insetPx, this.insetPx, this.insetPx, 0, 0, this.insetPx, this.insetPx);
+      ctx.drawImage(this.canvas, 0, this.canvas.height - px, px, px, 0, 0, px, px);
     }
     r.setScissorTest(false);
     r.setViewport(0, 0, w, h);

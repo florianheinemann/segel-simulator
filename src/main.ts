@@ -274,8 +274,8 @@ function updateHud() {
   rot('iAwaArrow', sim.awa);
   // Marke „vorn“ am Rand der Verklicker-Lupe
   const vb = $('vaneBow').style;
-  vb.left = `${50 + view.vaneBow.x * 36}%`;
-  vb.top = `${50 + view.vaneBow.y * 36}%`;
+  vb.left = `${50 + view.vaneBow.x * 50}%`;
+  vb.top = `${50 + view.vaneBow.y * 50}%`;
 
   const r = sim.rudder;
   $('rudLbl').textContent = Math.abs(r) < 0.5 ? 'Ruder mittschiffs' : `Ruder ${Math.abs(r).toFixed(0)}° ${r > 0 ? 'Stb' : 'Bb'}`;

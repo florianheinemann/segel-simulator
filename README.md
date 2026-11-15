@@ -15,8 +15,8 @@ Home-Bildschirm hinzufügen.
 | Element | Bedeutung |
 | --- | --- |
 | 3D-Sicht | Blick vom Steuerstand nach vorn; der Rudergänger sitzt in Luv. Über die See ziehen = umsehen; der Blick bleibt stehen, „Blick voraus“ schwenkt zurück. |
-| Lupe „Verklicker“ | Blick vom Steuerstand hoch zum Masttopp. Der Pfeil zeigt in den **scheinbaren** Wind, die roten Marken stehen fest (im Menü abschaltbar). Der Bug liegt im Bild unten – so, wie man es beim Hochschauen sieht; die Marke „vorn“ zeigt die Richtung. |
-| Lupe „Fäden“ | Windfäden an der Fock (Bb rot, Stb grün); Antippen wechselt zu den Achterliekfäden am Groß. |
+| Lupe „Verklicker“ | Große Lupe oben rechts: Blick vom Steuerstand am Mast entlang nach oben, mit Saling, Wanten und Segel im Bild. Der Pfeil zeigt in den **scheinbaren** Wind, die roten Marken stehen fest (im Menü abschaltbar). Der Bug liegt im Bild unten – so, wie man es beim Hochschauen sieht; die Marke „vorn“ zeigt die Richtung. |
+| Lupe „Fäden“ | Links neben der Draufsicht: Windfäden an der Fock (Bb rot, Stb grün); Antippen wechselt zu den Achterliekfäden am Groß. |
 | Instrumente | Kompasskurs, Fahrt durchs Wasser (FdW), scheinbarer Wind, Krängung, GPS (KüG/FüG). |
 | Rad | Schieber, der stehen bleibt, wo man ihn loslässt – so sieht man, wie viel Ruder man gegen die Luvgierigkeit hält. Die Knöpfe daneben legen je 1° nach Bb/Stb. |
 | Pause / Zeitlupe | ⏸ hält die Simulation an, „1×“ schaltet auf halbe und viertel Geschwindigkeit – praktisch zum Üben der Manöver. |

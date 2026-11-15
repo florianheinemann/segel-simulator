@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.6 – 2026-11-15
+
+- Verklicker-Lupe deutlich größer und weiter herausgezoomt: Mast, Saling, Wanten
+  und Segel sind im Bild, wie beim Blick nach oben vom Steuerstand
+- Neues Layout: Fäden-Lupe links neben der Draufsicht, Knöpfe für Pause,
+  Zeitlupe und Kommandos überlappen den unteren Lupenrand, „Crew trimmt die
+  Segel“ steht unten rechts, „Blick voraus“ über dem Rad-Schieber
+
 ## 0.3.5 – 2026-11-15
 
 - Option im Menü: rote Marken (Bügel) am Verklicker ein- und ausblenden
