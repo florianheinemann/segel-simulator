@@ -264,6 +264,34 @@ export class View {
     sc.add(this.yawG, this.vaneCam, this.tellCam);
   }
 
+  private marksG = new THREE.Group();
+  /** Tonnen des Kurses zeichnen: die nächste (hervorgehoben) und die danach */
+  setCourse(marks: { x: number; z: number }[], idx: number) {
+    this.marksG.clear();
+    if (!this.marksG.parent) this.scene.add(this.marksG);
+    marks.forEach((m, i) => {
+      if (i < idx || i > idx + 1) return;
+      const active = i === idx;
+      const mat = new THREE.MeshBasicMaterial({ color: active ? 0xff8c1a : 0xb9c2c9 });
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.1, 3, 12), mat);
+      body.position.y = 1.2;
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 7, 6), new THREE.MeshBasicMaterial({ color: 0x222222 }));
+      pole.position.y = 6;
+      const top = new THREE.Mesh(new THREE.SphereGeometry(active ? 1.1 : 0.7, 12, 8), mat);
+      top.position.y = 9.5;
+      g.add(body, pole, top);
+      g.position.set(m.x, 0, m.z);
+      this.marksG.add(g);
+    });
+  }
+  /** Bildschirmposition (0..1) eines Punkts in der Hauptansicht; null, wenn nicht im Bild */
+  project(x: number, y: number, z: number): { x: number; y: number } | null {
+    const v = V(x, y, z).project(this.cam);
+    if (v.z > 1 || Math.abs(v.x) > 0.98 || Math.abs(v.y) > 0.98) return null;
+    return { x: (v.x + 1) / 2, y: (1 - v.y) / 2 };
+  }
+
   private buildCoast() {
     // Hügelkette rund um das Revier
     const seg = 360;

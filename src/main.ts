@@ -3,6 +3,7 @@ import { Config, Level, MS2KN, RUDDER_MAX, SHEET, Sim, defaultConfig, levelPrese
 import { View } from './scene';
 import { initPwa } from './pwa';
 import { COMMANDS, Crew, Report, Voice } from './maneuver';
+import { Course } from './course';
 
 declare const __APP_VERSION__: string;
 declare const __BUILD__: string;
@@ -148,14 +149,76 @@ function handleEvents(dt: number) {
 const crew = new Crew(sim);
 crew.say = (voice, text) => toast(text, voice);
 let reportTimer = 0;
-crew.onReport = (r: Report) => {
+const showReport = (r: Pick<Report, 'ok' | 'title' | 'lines'>, ms = 15000) => {
   const el = $('report');
   el.className = r.ok ? 'ok' : 'bad';
   el.innerHTML = `<b>${r.title}</b><ul>${r.lines.map((l) => `<li>${l}</li>`).join('')}</ul><small>Tippen zum Schließen</small>`;
   el.hidden = false;
   clearTimeout(reportTimer);
-  reportTimer = window.setTimeout(() => (el.hidden = true), 15000);
+  reportTimer = window.setTimeout(() => (el.hidden = true), ms);
 };
+crew.onReport = (r: Report) => {
+  if (course && !course.done) (r.ok ? courseStats.clean++ : courseStats.flawed++);
+  showReport(r);
+};
+
+// ---- Kursmodus -------------------------------------------------------------------
+let course: Course | null = null;
+const courseStats = { clean: 0, flawed: 0 };
+const mmss = (t: number) => `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+function setCourse(on: boolean) {
+  if (on) {
+    sim.reset();
+    crew.reset();
+    setRudder(0);
+    course = new Course(sim);
+    courseStats.clean = courseStats.flawed = 0;
+    view.setCourse(course.marks, 0);
+    toast(`Kurs gestartet – zuerst zur ${course.marks[0].name}, sie liegt genau in Luv`, 'info');
+  } else {
+    course = null;
+    view.setCourse([], 0);
+  }
+  $('course').hidden = $('markTag').hidden = !on;
+  $('tvMark').style.display = $('tvMarkLbl').style.display = on ? '' : 'none';
+  $('courseBtn').textContent = on ? 'Kurs beenden' : 'Kurs abfahren';
+}
+function updateCourse(dt: number) {
+  if (!course || course.done) return;
+  const hit = course.update(sim, dt);
+  if (!hit) return;
+  view.setCourse(course.marks, course.idx);
+  if (hit === 'mark') {
+    const n = course.next!;
+    toast(`${course.marks[course.idx - 1].name} erreicht – weiter: ${n.name}`, 'info');
+  } else {
+    const man = courseStats.clean + courseStats.flawed;
+    showReport({
+      ok: courseStats.flawed === 0,
+      title: 'Kurs geschafft!',
+      lines: [
+        `Zeit: ${mmss(course.time)} min`,
+        `Gesegelte Strecke: ${course.distance.toFixed(0)} m (kürzester Weg über Grund: 1600 m)`,
+        man ? `Angesagte Manöver: ${courseStats.clean} sauber, ${courseStats.flawed} mit Abzügen` : 'Keine Manöver angesagt',
+      ],
+    }, 60000);
+    $('markTag').hidden = true;
+    $('tvMark').style.display = 'none';
+    $('course').innerHTML = `<b>Kurs geschafft</b> · ${mmss(course.time)} min`;
+  }
+}
+function updateMarkTag() {
+  if (!course || course.done) return;
+  const m = course.next!;
+  const tag = $('markTag');
+  const pt = view.project(m.x, 13, m.z);
+  tag.hidden = !pt;
+  if (pt) {
+    tag.style.left = `${pt.x * 100}%`;
+    tag.style.top = `${pt.y * 100}%`;
+    tag.textContent = `${m.name} · ${course.distanceTo(sim).toFixed(0)} m`;
+  }
+}
 $('report').addEventListener('click', () => ($('report').hidden = true));
 const cmds = $('cmds');
 for (const c of COMMANDS) {
@@ -226,6 +289,11 @@ function updateHud() {
     $('tvCur').style.display = sim.cfg.currentKn > 0 ? '' : 'none';
     rot('tvCur', sim.cfg.currentSet - sim.heading + 180);
   }
+  if (course && !course.done) {
+    const m = course.next!;
+    rot('tvMark', course.bearingTo(sim) - sim.heading);
+    $('course').innerHTML = `<b>${m.name}</b> (${course.idx + 1}/${course.marks.length}) · peilt ${deg3(course.bearingTo(sim))} · ${course.distanceTo(sim).toFixed(0)} m · ${mmss(course.time)}<span class="pos">${m.leg}</span>`;
+  }
   if (prefs.hint) {
     const pos = `${pointOfSail(sim.twa)} · ${bug()} (Wind von ${sim.mainSide > 0 ? 'Stb' : 'Bb'})`;
     $('hint').innerHTML = `<span class="pos">${pos}</span>${crew.nextStep() ?? hintText()}`;
@@ -262,7 +330,8 @@ const openMenu = (open: boolean) => {
 };
 $('menuBtn').addEventListener('click', () => openMenu(true));
 $('closeMenu').addEventListener('click', () => openMenu(false));
-$('restart').addEventListener('click', () => { sim.reset(); crew.reset(); setRudder(0); $('report').hidden = true; openMenu(false); });
+$('restart').addEventListener('click', () => { setCourse(false); sim.reset(); crew.reset(); setRudder(0); $('report').hidden = true; openMenu(false); });
+$('courseBtn').addEventListener('click', () => { $('report').hidden = true; setCourse(!course); openMenu(false); });
 document.querySelectorAll<HTMLButtonElement>('#levels button').forEach((b) =>
   b.addEventListener('click', () => { Object.assign(sim.cfg, levelPreset(+b.dataset.level! as Level)); syncMenu(); }));
 const bind = (id: string, fn: (el: HTMLInputElement) => void) => $<HTMLInputElement>(id).addEventListener('input', (e) => { fn(e.target as HTMLInputElement); syncMenu(); });
@@ -274,6 +343,7 @@ bind('cGust', (el) => (sim.cfg.gusts = el.checked));
 bind('cTop', (el) => (prefs.top = el.checked));
 bind('cHint', (el) => (prefs.hint = el.checked));
 showCmds(prefs.cmds);
+setCourse(false);
 $('ver').textContent = `v${__APP_VERSION__} · Build ${__BUILD__.split('+')[1]}`;
 syncMenu();
 
@@ -288,11 +358,13 @@ function frame(now: number) {
     applyKeys(dt);
     sim.step(dt);
     handleEvents(dt);
+    updateCourse(dt);
     view.update(sim, dt);
     if ((hudT += dt) > 0.1) { hudT = 0; updateHud(); }
   }
   lookBtn.hidden = !view.lookedAway || view.recentering;
   view.render();
+  updateMarkTag();
   requestAnimationFrame(frame);
 }
 view.update(sim, 0);

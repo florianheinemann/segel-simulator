@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 – 2026-11-15
+
+Kursmodus.
+
+- „Kurs abfahren“ im Menü: vier Tonnen im Viereck, am Wind ausgerichtet –
+  aufkreuzen zur Luvtonne, Halbwind, raumschots zur Leetonne, Halbwind ins Ziel
+- Anzeige von Peilung, Entfernung und Zeit; Marke über der nächsten Tonne im
+  Bild und Punkt in der Draufsicht
+- Abdrift und Strom werden an den Tonnen sichtbar
+- Auswertung am Ziel: Zeit, gesegelte Strecke, Zahl der sauberen Manöver
+
 ## 0.2.2 – 2026-11-15
 
 - Schaltflächen für Pause (⏸) und Zeitlupe (1× / ½× / ¼×) neben „Kommandos“

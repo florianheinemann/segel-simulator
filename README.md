@@ -45,6 +45,22 @@ Großschot über, ist es eine Patenthalse. Nach dem Manöver zeigt eine kurze
 Auswertung Dauer, Fahrtverlust und Fehler. Mit eingeschalteten Trimm-Hinweisen
 nennt die Hinweiszeile jeweils den nächsten Schritt.
 
+## Kursmodus
+
+„Kurs abfahren“ im Menü legt vier Tonnen im Viereck aus, ausgerichtet am Wind:
+
+1. **Luvtonne**, 450 m genau in Luv – aufkreuzen mit Wenden.
+2. **Tonne 2**, 350 m querab – Halbwind, Kurs halten.
+3. **Leetonne**, 450 m genau in Lee – raumschots mit Halse.
+4. **Ziel** am Startpunkt – Halbwind zurück.
+
+Eine Tonne gilt als erreicht, wenn man näher als 40 m herankommt. Oben links
+stehen Peilung, Entfernung und Zeit, im Bild sitzt eine Marke über der nächsten
+Tonne, in der Draufsicht ein oranger Punkt. Weil die Tonnen fest im Grund
+stehen, sieht man an ihnen Abdrift und Strom: Der Bug zeigt nicht dorthin,
+wohin das Boot wirklich läuft (Kompass gegen KüG). Am Ziel gibt es eine
+Auswertung mit Zeit, Strecke und Manövern.
+
 ## Stufen
 
 | Stufe | Du machst | Dazu kommt |
@@ -87,7 +103,7 @@ hinzufügen – iOS übernimmt beides nur beim Hinzufügen.
 
 Die Physik liegt in `src/sim.ts` (ohne Rendering, mit Tests in
 `src/sim.test.ts`), die Manöverlogik in `src/maneuver.ts` (Tests in
-`src/maneuver.test.ts`), die 3D-Szene in `src/scene.ts`, die Bedienung in
+`src/maneuver.test.ts`), der Kursmodus in `src/course.ts`, die 3D-Szene in `src/scene.ts`, die Bedienung in
 `src/main.ts`, Offline-Cache und Aktualisierung in `src/pwa.ts` und
 `public/sw.js`. Icons und Startbilder erzeugt `node scripts/gen-assets.cjs` aus
 `public/icon.svg` (braucht Playwright).
@@ -121,5 +137,4 @@ Menü angezeigt.
 
 ## Fahrplan
 
-- **v0.3** – Kursmodus mit Tonnen zum Üben von Wenden, Halsen und Kurshalten.
-- Später: Pause/Zeitlupe als Schaltfläche, Reffen.
+- Reffen, eigene Schotarbeit im Manöver.

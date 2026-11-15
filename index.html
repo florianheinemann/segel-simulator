@@ -49,7 +49,11 @@
     <div class="inset" id="tellInset"><canvas id="insTell"></canvas><span id="tellLabel">Fock-Fäden ⇄</span></div>
   </div>
 
-  <div id="hint"></div>
+  <div id="leftcol">
+    <div id="hint"></div>
+    <div id="course" hidden></div>
+  </div>
+  <div id="markTag" hidden></div>
   <button id="lookReset" hidden>⟲ Blick voraus</button>
   <div id="tools">
     <button id="pauseBtn" aria-label="Pause">⏸</button>
@@ -61,6 +65,7 @@
 
   <svg id="topview" viewBox="-50 -50 100 100" aria-hidden="true">
     <circle r="47" class="tvbg"/>
+    <g id="tvMark"><circle cx="0" cy="-43" r="4" class="mark"/></g>
     <g id="tvCur"><path d="M0 30 L0 44 M-4 39 L0 45 L4 39" class="cur"/></g>
     <g id="tvTw"><path d="M0 -46 L0 -30 M-4 -35 L0 -29 L4 -35" class="tw"/></g>
     <g id="tvAw"><path d="M0 -46 L0 -26 M-5 -32 L0 -25 L5 -32" class="awl"/></g>
@@ -69,7 +74,7 @@
     <line id="tvBoom" x1="0" y1="-5" x2="0" y2="14" class="sail"/>
     <line id="tvRud" x1="0" y1="20" x2="0" y2="28" class="rud"/>
   </svg>
-  <div id="tvLegend"><i class="l-aw"></i>scheinbar <i class="l-tw"></i>wahr</div>
+  <div id="tvLegend"><i class="l-aw"></i>scheinbar <i class="l-tw"></i>wahr<span id="tvMarkLbl"> <i class="l-mk"></i>Tonne</span></div>
 
   <div id="bottom">
     <div class="sheet" id="sheetMain">
@@ -116,9 +121,11 @@
       <label><input id="cHint" type="checkbox"> Trimm-Hinweise</label>
     </div>
     <div class="actions">
+      <button id="courseBtn">Kurs abfahren</button>
       <button id="restart">Neu starten</button>
       <button id="closeMenu" class="primary">Weiter segeln</button>
     </div>
+    <p class="help">Kurs abfahren: vier Tonnen im Viereck – aufkreuzen zur Luvtonne, Halbwind, raumschots zur Leetonne, Halbwind ins Ziel. Eine Tonne gilt als erreicht, wenn du näher als 40 m herankommst.</p>
     <p class="help">Manöver: „Kommandos“ öffnet die Tafel. Die Crew arbeitet nur auf Kommando – auch die Fock geht erst mit „Über die Fock!“ über.</p>
     <p class="help">Rad: Schieber bleibt stehen, wo du ihn loslässt; die Knöpfe daneben legen je 1° Ruder nach Bb/Stb (halten = weiter). Über die See ziehen = umsehen, „Blick voraus“ schwenkt zurück. Tastatur: ←/→ Ruder, Q/A Groß, W/S Fock, Leertaste Pause. ⏸ hält an, „1×“ schaltet auf halbe und viertel Geschwindigkeit.</p>
   </div>
